@@ -1,0 +1,99 @@
+#ifndef SysHelper_h
+#define SysHelper_h
+
+#include <string>
+#include <FWCore/Framework/interface/EDAnalyzer.h>
+#include <DataFormats/PatCandidates/interface/CompositeCandidate.h>
+
+using namespace edm;
+using namespace pat;
+
+class SysHelper{
+  public:
+     SysHelper();
+     ~SysHelper(){};
+     void MakeBranches(TTree *tree);
+     void FillTree(TTree *tree, const char* sysType);
+
+  private:
+     Float_t _variable;
+     
+     
+     CompositeCandidate SelectPair(const View<CompositeCandidate>* cands, const char* sysType)
+     {
+for(edm::View<pat::CompositeCandidate>::const_iterator candi = cands->begin(); candi!=cands->end();++candi) {
+    const pat::CompositeCandidate& candSynch = (*candi);
+
+    float decayModeSynch1=-1.;
+    int decayModeFindingNewDMsSynch1=-1;
+    int byVVLooseDeepTau2017v2p1VSeSynch1=-1,byTightDeepTau2017v2p1VSmuSynch1=-1, byMediumDeepTau2017v2p1VSjetSynch1=-1;
+
+    if(candSynch.daughter(0)->isMuon() && !candSynch.daughter(0)->isElectron() && !candSynch.daughter(1)->isMuon() && !candSynch.daughter(1)->isElectron()){
+      decayModeSynch1=userdatahelpers::getUserFloat (candSynch.daughter(1), "decayMode");
+      decayModeFindingNewDMsSynch1=userdatahelpers::getUserInt (candSynch.daughter(1), "decayModeFindingNewDMs");
+      TauP4Corrected=P4Corrected(candSynch.daughter(1)->p4(),GenMatch(candSynch.daughter(1), event),decayModeSynch1);
+      //
+      byMediumDeepTau2017v2p1VSjetSynch1=userdatahelpers::getUserInt (candSynch.daughter(1), "byMediumDeepTau2017v2p1VSjet");
+      byVVLooseDeepTau2017v2p1VSeSynch1=userdatahelpers::getUserInt (candSynch.daughter(1), "byVVLooseDeepTau2017v2p1VSe");
+      byTightDeepTau2017v2p1VSmuSynch1=userdatahelpers::getUserInt (candSynch.daughter(1), "byTightDeepTau2017v2p1VSmu");
+      //
+      MuonP4=candSynch.daughter(0)->p4();
+    }
+    else TauP4Corrected=candSynch.daughter(1)->p4();
+    //MuTau
+    if(!candSynch.daughter(0)->isMuon()) continue;
+    if(candSynch.daughter(1)->isMuon() || candSynch.daughter(1)->isElectron()) continue;
+    //di-lepton && third lepton
+    bool DiLepton = false, ThirdLepton = false;
+    for(edm::View<reco::Candidate>::const_iterator daui = daus->begin(); daui!=daus->end();++daui){
+      const reco::Candidate* candi = &(*daui);
+      if(deltaR(candi->p4(),TauP4Corrected)>0.5 && deltaR(candi->p4(),MuonP4)>0.5){
+          if(EleVeto(candi) || MuVeto(candi)) ThirdLepton = true;
+        }
+        for(edm::View<reco::Candidate>::const_iterator dauj = daus->begin(); dauj!=daus->end();++dauj){
+          const reco::Candidate* candj = &(*dauj);
+          if(candi == candj) continue;
+          if(DiEle(candi,candj) || DiMuon(candi,candj)) DiLepton = true;
+        }
+    }
+    if(DiLepton == true || ThirdLepton == true) continue; // To check if it's continue or return
+    //pT
+    if(TauP4Corrected.Pt()<15 || MuonP4.Pt()<15) continue;
+    //eta
+    if(std::abs(candSynch.daughter(0)->eta())>2.4 || std::abs(candSynch.daughter(1)->eta())>2.3) continue;
+    //dz
+    if(std::abs(userdatahelpers::getUserFloat(candSynch.daughter(0),"dz")) > 0.2 || std::abs(userdatahelpers::getUserFloat(candSynch.daughter(1),"dz")) > 0.2) continue;
+    //decay mode
+    if(decayModeFindingNewDMsSynch1<0.5 || decayModeSynch1 == 5 || decayModeSynch1 == 6) continue;
+    //ID
+    if(byMediumDeepTau2017v2p1VSjetSynch1<0.5 || byVVLooseDeepTau2017v2p1VSeSynch1<0.5 || byTightDeepTau2017v2p1VSmuSynch1<0.5) continue;
+    if(!CHECK_BIT(userdatahelpers::getUserInt(candSynch.daughter(0),"muonID"),2)) continue;
+    //muon isolation
+    if(userdatahelpers::getUserFloat(candSynch.daughter(0),"combRelIsoPF")>(0.15*MuonP4.Pt())) continue;
+    //charge
+    if(std::abs(candSynch.daughter(0)->charge())!=1 || std::abs(candSynch.daughter(1)->charge())!=1) continue;
+    if(candSynch.daughter(1)->charge()*candSynch.daughter(0)->charge()>0) continue;
+    //delta R
+    if(deltaR(TauP4Corrected,MuonP4)<0.5) continue;
+    int tauIndex=-99,muonIndex=-99;
+    double dRmin1=0.00001;
+    double dRmin2=0.00001;
+    for(unsigned int i=0;i<LeptonP4.size();i++)
+      {
+        if(abs(deltaR(LeptonP4.at(i),candSynch.daughter(0)->p4()))<dRmin1){muonIndex=i;dRmin1=deltaR(LeptonP4.at(i),candSynch.daughter(0)->p4());}
+        if(abs(deltaR(LeptonP4.at(i),candSynch.daughter(1)->p4()))<dRmin2){tauIndex=i;dRmin2=deltaR(LeptonP4.at(i),candSynch.daughter(1)->p4());}
+      }
+    candVectorSynch.push_back(candSynch);
+    NpairsSynch++;
+  }
+
+  if(NpairsSynch!=0){
+    SelectedPairs=NpairsSynch;
+    std::sort(candVectorSynch.begin(),candVectorSynch.end(),ComparePairsbyIso);
+  }
+  else return;
+
+     }
+};
+#endif
+  

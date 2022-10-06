@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if [ -d "CMSSW_10_2_23" ]; then
+  echo 'CMSSW is already setup'
+  exit 1
+fi
+
+echo 'Setting up CMSSW_10_2_23...'
+
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+source /cvmfs/cms.cern.ch/crab3/crab.sh
+
+scramv1 project CMSSW CMSSW_10_2_23
+cd CMSSW_10_2_23/src
+eval `scramv1 runtime -sh`
+
+ln -s ../../EGamma EGamma
+ln -s ../../GeneratorInterface GeneratorInterface
+ln -s ../../HTT-utilities HTT-utilities
+ln -s ../../HiggsCPinTauDecays HiggsCPinTauDecays
+ln -s ../../LLRHiggsTauTau LLRHiggsTauTau
+ln -s ../../Muon Muon
+ln -s ../../RecoEgamma RecoEgamma
+ln -s ../../RecoJets RecoJets
+ln -s ../../RecoMET RecoMET
+ln -s ../../RecoTauTag RecoTauTag
+ln -s ../../TauAnalysis TauAnalysis
+ln -s ../../TauAnalysisTools TauAnalysisTools
+ln -s ../../TauPOG TauPOG
+ln -s ../../TauPolSoftware TauPolSoftware
+ln -s ../../UFHZZAnalysisRun2 UFHZZAnalysisRun2
+
+cd ../../
+
+var=$(pwd)
+sed -i "s%/opt/sbg/cms/safe1/cms/msessini/ProductionTools%$var%g" LLRHiggsTauTau/NtupleProducer/src/SysHelper.cc
+sed -i "s%/opt/sbg/cms/safe1/cms/msessini/ProductiomTools%$var%g" LLRHiggsTauTau/NtupleProducer/plugins/HTauTauNtuplizer.cc
+
+cd CMSSW_10_2_23/src
+scramv1 b -j 8
+

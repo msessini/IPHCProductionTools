@@ -1,0 +1,173 @@
+#include <LLRHiggsTauTau/NtupleProducer/interface/FakeFactors.h>
+
+FakeFactors::FakeFactors(Int_t theYear, std::string sysType) {
+
+  year_ = std::to_string(theYear);
+  isNominal_ = (sysType ==  "Nominal") ? true : false;
+
+  TFile f_fracs("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/fake_factors/mva_fract_mt_2018.root");
+  ff_fracs_qcd_ = (TH2D*)f_fracs.Get("QCD");
+  ff_fracs_wjets_ = (TH2D*)f_fracs.Get("W");
+  ff_fracs_qcd_->SetDirectory(0);
+  ff_fracs_wjets_->SetDirectory(0);
+  f_fracs.Close();
+
+  TFile f_fracs_ss("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/fake_factors/mva_fract_mt_2018_ss.root");
+  ff_fracs_qcd_ss_ = (TH2D*)f_fracs_ss.Get("QCD");
+  ff_fracs_wjets_ss_ = (TH2D*)f_fracs_ss.Get("W");
+  ff_fracs_qcd_ss_->SetDirectory(0);
+  ff_fracs_wjets_ss_->SetDirectory(0);
+  f_fracs_ss.Close();
+
+  TFile f_fracs_aiso("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/fake_factors/mva_fract_mt_2018_aiso.root");
+  ff_fracs_qcd_aiso_ = (TH2D*)f_fracs_aiso.Get("QCD");
+  ff_fracs_wjets_aiso_ = (TH2D*)f_fracs_aiso.Get("W");
+  ff_fracs_qcd_aiso_->SetDirectory(0);
+  ff_fracs_wjets_aiso_->SetDirectory(0);
+  f_fracs_aiso.Close();
+
+  TFile f_fracs_highmt("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/fake_factors/mva_fract_mt_2018_highmt.root");
+  ff_fracs_qcd_highmt_ = (TH2D*)f_fracs_highmt.Get("QCD");
+  ff_fracs_wjets_highmt_ = (TH2D*)f_fracs_highmt.Get("W");
+  ff_fracs_qcd_highmt_->SetDirectory(0);
+  ff_fracs_wjets_highmt_->SetDirectory(0);
+  f_fracs_highmt.Close();
+
+  TFile f(("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/fake_factors/fakefactors_ws_mt_lite_"+year_+".root").c_str());
+  ff_ws_ = std::shared_ptr<RooWorkspace>((RooWorkspace*)gDirectory->Get("w"));
+  f.Close();
+
+  systs_mvadm_ = {"","_wjets_syst_up","_wjets_syst_down","_wjets_met_up","_wjets_met_down","_wjets_l_pt_up","_wjets_l_pt_down","_wjets_stat_unc1_njet0_mvadm10_up","_wjets_stat_unc2_njet0_mvadm10_up","_wjets_stat_unc1_njet0_mvadm10_down","_wjets_stat_unc2_njet0_mvadm10_down","_wjets_stat_unc1_njet1_mvadm10_up","_wjets_stat_unc2_njet1_mvadm10_up","_wjets_stat_unc1_njet1_mvadm10_down","_wjets_stat_unc2_njet1_mvadm10_down","_wjets_stat_unc1_njet2_mvadm10_up","_wjets_stat_unc2_njet2_mvadm10_up","_wjets_stat_unc1_njet2_mvadm10_down","_wjets_stat_unc2_njet2_mvadm10_down","_qcd_syst_up","_qcd_syst_down","_qcd_met_up","_qcd_met_down","_qcd_l_pt_up","_qcd_l_pt_down","_qcd_stat_unc1_njet0_mvadm10_up","_qcd_stat_unc2_njet0_mvadm10_up","_qcd_stat_unc1_njet0_mvadm10_down","_qcd_stat_unc2_njet0_mvadm10_down","_qcd_stat_unc1_njet1_mvadm10_up","_qcd_stat_unc2_njet1_mvadm10_up","_qcd_stat_unc1_njet1_mvadm10_down","_qcd_stat_unc2_njet1_mvadm10_down","_qcd_stat_unc1_njet2_mvadm10_up","_qcd_stat_unc2_njet2_mvadm10_up","_qcd_stat_unc1_njet2_mvadm10_down","_qcd_stat_unc2_njet2_mvadm10_down","_ttbar_syst_up","_ttbar_syst_down","_ttbar_met_up","_ttbar_met_down"};
+
+  for(auto s : systs_mvadm_) {
+    fns_["ff_lt_medium_mvadmbins"+s] = std::shared_ptr<RooFunctor>(
+      ff_ws_->function(("ff_mt_medium_mvadmbins"+s).c_str())->functor(ff_ws_->argSet("pt,mvadm,ipsig,njets,m_pt,os,met_var_qcd,met_var_w,mt,m_iso,pass_single,mvis,WpT,wjets_frac,qcd_frac,ttbar_frac")));
+  }
+
+}
+
+void FakeFactors::Initialize(const reco::Candidate *tau, const reco::Candidate *mu, double bfield, int tauDM, float met_px, float met_py, int Njets, double dijetMass, TVector3 pv, std::vector<std::vector<double>> pvcov) {
+
+  math::XYZTLorentzVector taup4 = tau->p4();
+  math::XYZTLorentzVector mup4 = mu->p4();
+  math::XYZTLorentzVector metp4(met_px, met_py, 0., 0.);
+  math::XYZTLorentzVector metp4w(metp4.px() + mup4.px(), metp4.py() + mup4.py(), 0., mup4.pt());
+  //
+  pt_tt_ = sqrt(pow((taup4.px() + mup4.px() + metp4.px()),2) + pow((taup4.py() + mup4.py() + metp4.py()),2));
+  pt_1_ = mup4.pt();
+  pt_2_ = taup4.pt();
+  met_ = metp4.pt();
+  m_vis_ = (taup4 + mup4).mass();
+  n_jets_ = Njets;
+  mjj_ = dijetMass;
+  mva_dm_2_ = tauDM;
+  mt_1_ = seltools::ComputeMT(mup4, metp4.px(), metp4.py());
+  //
+  double iso_1_ = userdatahelpers::getUserFloat(mu,"combRelIsoPF");
+  double met_var_qcd = (metp4.pt()/taup4.pt())*cos(deltaPhi(metp4.phi(), taup4.phi()));
+  double met_var_w = (metp4w.pt()/taup4.pt())*cos(deltaPhi(metp4w.phi(), taup4.phi()));
+  double WpT = metp4w.pt();
+  //
+  double singlemupt = 25.;
+  if(year_ == "2016") singlemupt = 23.;
+  double pass_single = 1.;
+  if(mup4.pt() < singlemupt) pass_single = 0.;
+  //
+  bool isOS = (tau->charge()*mu->charge())<0 ? true : false;
+  // load MVA scroes reader for fractions
+  reader_ = new TMVA::Reader();
+  reader_->AddVariable("pt_tt", &pt_tt_);
+  reader_->AddVariable("pt_1", &pt_1_);
+  reader_->AddVariable("pt_2", &pt_2_);
+  reader_->AddVariable("met", &met_);
+  reader_->AddVariable("m_vis", &m_vis_);
+  reader_->AddVariable("n_jets", &n_jets_);
+  reader_->AddVariable("mjj", &mjj_);
+  reader_->AddVariable("mva_dm_2", &mva_dm_2_);
+  reader_->AddVariable("mt_1", &mt_1_);
+  xml_file_="$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/fake_factors/fractions_"+year_+"_mt.xml";
+  reader_->BookMVA("BDT method", xml_file_);
+  //
+  std::vector<float> scores = reader_->EvaluateMulticlass("BDT method");
+  double qcd_score = scores[1];
+  double w_score = scores[0];
+  //
+  double w_frac = ff_fracs_wjets_->GetBinContent(ff_fracs_wjets_->FindBin(qcd_score,w_score));
+  double qcd_frac = ff_fracs_qcd_->GetBinContent(ff_fracs_qcd_->FindBin(qcd_score,w_score));
+  //
+  if(!isOS) {
+    w_frac = ff_fracs_wjets_ss_->GetBinContent(ff_fracs_wjets_ss_->FindBin(qcd_score,w_score));
+    qcd_frac = ff_fracs_qcd_ss_->GetBinContent(ff_fracs_qcd_ss_->FindBin(qcd_score,w_score));
+    if(w_frac==0. && qcd_frac==0.) qcd_frac = 1.;
+  }
+  if(iso_1_>0.15) {
+    w_frac = ff_fracs_wjets_aiso_->GetBinContent(ff_fracs_wjets_aiso_->FindBin(qcd_score,w_score));
+    qcd_frac = ff_fracs_qcd_aiso_->GetBinContent(ff_fracs_qcd_aiso_->FindBin(qcd_score,w_score));
+    if(w_frac==0. && qcd_frac==0.) qcd_frac = 1.;
+  }
+  if(mt_1_>70) {
+    w_frac = ff_fracs_wjets_highmt_->GetBinContent(ff_fracs_wjets_highmt_->FindBin(qcd_score,w_score));
+    qcd_frac = ff_fracs_qcd_highmt_->GetBinContent(ff_fracs_qcd_highmt_->FindBin(qcd_score,w_score));
+    if(w_frac==0. && qcd_frac==0.) w_frac = 1.;
+  }
+  double ttbar_frac = 1. - w_frac - qcd_frac;
+  double os = 1.;
+  if(!isOS) os = 0.;
+  //
+  double ipsig = GetIPsig(tau, bfield, pv, pvcov);
+  //
+  args_ = {pt_2_,mva_dm_2_,ipsig,n_jets_,pt_1_,os,met_var_qcd,met_var_w,mt_1_,iso_1_,pass_single,m_vis_,WpT,w_frac,qcd_frac,ttbar_frac};
+  args_qcd_ = {pt_2_,mva_dm_2_,ipsig,n_jets_,pt_1_,os,met_var_qcd,iso_1_,pass_single};
+  args_w_ = {pt_2_,mva_dm_2_,ipsig,n_jets_,pt_1_,met_var_w,mt_1_,pass_single,m_vis_,WpT};
+  args_ttbar_ = {pt_2_,mva_dm_2_,ipsig,n_jets_,met_var_w};
+}
+
+std::map<std::string, double> FakeFactors::GetFakeFactors() {
+
+  fake_factors_["ff_nominal"] = fns_["ff_lt_medium_mvadmbins"]->eval(args_.data());
+  fake_factors_["ff_nominal_qcd"] = fns_["ff_lt_medium_mvadmbins_qcd"]->eval(args_qcd_.data()); 
+  fake_factors_["ff_nominal_w"] = fns_["ff_lt_medium_mvadmbins_w"]->eval(args_w_.data());
+  fake_factors_["ff_nominal_ttbar"] = fns_["ff_lt_medium_mvadmbins_ttbar"]->eval(args_ttbar_.data());
+  //
+  if(isNominal_) {
+    for(auto s : systs_mvadm_) {
+      if(s == "") continue;
+      fake_factors_["ff"+s] = fns_["ff_lt_medium_mvadmbins"+s]->eval(args_.data());
+    }
+  }
+  return fake_factors_;
+}
+
+//////////////////////////////////////////
+
+double FakeFactors::GetIPsig(const reco::Candidate *tau, double bfield, TVector3 pv, std::vector<std::vector<double>> pvcov) {
+ 
+  std::vector<float> h_param = {};
+  for(auto i : tau->bestTrack()->parameters()) h_param.push_back(i);
+     ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float> > ref(tau->svx(),tau->svy(),tau->svz());
+      ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float> > pv(vertex->vx(),vertex->vy(),vertex->vz());
+      std::vector<ic::PFCandidate*> charged_cands = GetTauHads(tau, pfcands, 0);
+
+      ImpactParameter IP;
+      TVector3 ip = IP.CalculatePCA(B, h_param, ref, pv);
+
+      ROOT::Math::SMatrix<double,5,5, ROOT::Math::MatRepSym<double,5>> helixCov = tau->track_params_covariance();
+      SMatrixSym3D SigmaPrV = vertex->covariance();
+
+      ROOT::Math::SMatrix<double,3,3, ROOT::Math::MatRepStd< double, 3, 3 >> ip_cov = IP.CalculatePCACovariance(helixCov, SigmaPrV);
+
+      double mag = ip.Mag();
+      ROOT::Math::SVector<double, 3> ip_svec;
+      ip_svec(0) = ip.X();
+      ip_svec(1) = ip.Y();
+      ip_svec(2) = ip.Z();
+
+      ip_svec = ip_svec.Unit();
+
+      double uncert = sqrt(ROOT::Math::Dot( ip_svec, ip_cov * ip_svec));
+      double sig = mag/uncert;
+      return std::make_pair(ip, sig);
+
+
+
+}

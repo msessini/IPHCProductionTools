@@ -1,0 +1,28 @@
+#ifndef CPTools_h
+#define CPTools_h
+
+#include <DataFormats/Candidate/interface/Candidate.h>
+#include <DataFormats/PatCandidates/interface/Tau.h>
+#include <LLRHiggsTauTau/NtupleProducer/interface/DaughterDataHelpers.h>
+#include <LLRHiggsTauTau/NtupleProducer/interface/TrackParticle.h>
+#include <LLRHiggsTauTau/NtupleProducer/interface/LorentzVectorParticle.h>
+#include <SimpleFits/FitSoftware/interface/GlobalEventFit.h>
+#include <HiggsCPinTauDecays/TauDecaysInterface/interface/SCalculator.h>
+
+
+ class CPTools : public SCalculator{
+  public:
+    CPTools(std::vector<std::vector<double>> pionsP4, std::vector<double> pionsCharge);
+    ~CPTools(){};
+
+    PTObject setMET(float MET_px, float MET_py, std::vector<float> MET_cov);
+    void initGEF(LorentzVectorParticle a1, TrackParticle muon, TVector3 PV, TMatrixTSym<double> PVCov);
+
+  private:
+    void GetPVandCov(TVector3 pv, std::vector<std::vector<double>> pvcov);
+  
+    TLorentzVector GetHadTau(TVector3 PV, TMatrixTSym<double> PVCov, LorentzVectorParticle A1, TrackParticle Muon, PTObject MET);
+
+  };
+
+#endif

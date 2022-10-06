@@ -1,0 +1,22 @@
+83,84c83,84
+<         path1 = cms.vstring ("hltL3crIsoBigORMu18erTauXXer2p1L1f0L2f10QL3f20QL3trkIsoFiltered0p07","hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+<         path2 = cms.vstring ("hltHpsSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched","hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+---
+>         path1 = cms.vstring ("hltL3crIsoBigORMu18erTauXXer2p1L1f0L2f10QL3f20QL3trkIsoFiltered0p07",""),
+>         path2 = cms.vstring ("hltL1sBigORMu18erTauXXer2p1",""),
+89a90
+>     ##8 below
+134a136,146
+>     ##13 below
+>     cms.PSet (
+>         HLT = cms.string("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v"),
+>         path1 = cms.vstring ("hltL3crIsoL1sMu18erTau24erIorMu20erTau24erL1f0L2f10QL3f20QL3trkIsoFiltered0p07","hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+> 	path2 = cms.vstring ("hltSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched","hltOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+>         path3 = cms.vstring (""),
+>         path4 = cms.vstring (""),
+>         leg1 = cms.int32(13),
+>         leg2 = cms.int32(15)
+>         ),
+>     ##14 below
+143a156
+> 

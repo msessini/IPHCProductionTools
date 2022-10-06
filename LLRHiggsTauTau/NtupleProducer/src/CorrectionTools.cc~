@@ -1,0 +1,671 @@
+#include <LLRHiggsTauTau/NtupleProducer/interface/SelectionTools.h>
+#include <LLRHiggsTauTau/NtupleProducer/interface/CorrectionTools.h>
+
+void corrector::METRecoilCorrection(const edm::Event& event, edm::EDGetTokenT<edm::View<pat::GenericParticle>> generictag, const pat::MET& PUPPImet, int Njets, float shiftedMETx, float shiftedMETy, std::string sysType, std::string var, Int_t theYear) {
+
+    edm::Handle<edm::View<pat::GenericParticle> > candHandle;
+
+    event.getByToken(generictag, candHandle);
+    const edm::View<pat::GenericParticle>* gens = candHandle.product();
+    math::XYZTLorentzVector visgenP4, genP4;
+    for(edm::View<pat::GenericParticle>::const_iterator igen = gens->begin(); igen!=gens->end(); ++igen) {
+      unsigned pdgid = abs(igen->pdgId());
+      unsigned status = abs(igen->status());
+      unsigned flag = igen->userInt ("generalGenFlags");
+      math::XYZTLorentzVector iGenP4(igen->px(), igen->py(), igen->pz(), igen->energy());
+      if((pdgid>=11 && pdgid<=16 && seltools::CHECK_BIT(flag,8) && status == 1) || seltools::CHECK_BIT(flag,10)) genP4+=iGenP4;
+      if(((pdgid == 11 || pdgid == 13 || pdgid == 15) && seltools::CHECK_BIT(flag,8) && status==1) || (seltools::CHECK_BIT(flag,10) && !(pdgid==12||pdgid==14||pdgid==16))) visgenP4+=iGenP4;
+    }
+    //
+    auto year = std::to_string(theYear);
+    RecoilCorrector *recoilPuppiMetCorrector = new RecoilCorrector(("HTT-utilities/RecoilCorrections/data/Type1_PuppiMET_"+year+".root").c_str());
+    MEtSys *recoilPuppiMetShifter = new MEtSys(("HTT-utilities/RecoilCorrections/data/PuppiMETSys_"+year+".root").c_str());
+
+    if(sysType == "METReso") {
+      if(var == "Up") {
+        recoilPuppiMetShifter->ApplyMEtSys(
+                                           (float)PUPPImet.px(), // uncorrected type I puppi met px (float)
+                                           (float)PUPPImet.py(), // uncorrected type I puppi met py (float)
+                                           (float)genP4.px(), // generator Z/W/Higgs px (float)
+                                           (float)genP4.py(), // generator Z/W/Higgs py (float)
+                                           (float)visgenP4.px(), // generator visible Z/W/Higgs px (float)
+                                           (float)visgenP4.py(), // generator visible Z/W/Higgs py (float)
+                                           Njets,  // number of jets (hadronic jet multiplicity) (int)
+                                           1, // shift for hadronic recoil response
+                                           0, // upward shift
+                                           shiftedMETx, // shifted type I puppi met px (float)
+                                           shiftedMETy  // shifted type I puppi met py (float)
+					   );
+      }
+      if(var == "Down") {
+        recoilPuppiMetShifter->ApplyMEtSys(
+                                           (float)PUPPImet.px(), // uncorrected type I puppi met px (float)
+                                           (float)PUPPImet.py(), // uncorrected type I puppi met py (float)
+                                           (float)genP4.px(), // generator Z/W/Higgs px (float)
+                                           (float)genP4.py(), // generator Z/W/Higgs py (float)
+                                           (float)visgenP4.px(), // generator visible Z/W/Higgs px (float)
+                                           (float)visgenP4.py(), // generator visible Z/W/Higgs py (float)
+                                           Njets,  // number of jets (hadronic jet multiplicity) (int)
+                                           1, // shift for hadronic recoil response
+                                           1, // downward shift
+                                           shiftedMETx, // shifted type I puppi met px (float)
+                                           shiftedMETy  // shifted type I puppi met py (float)
+					   );
+      }
+    }
+    else if(sysType == "METScale") {
+      if(var == "Up") {
+        recoilPuppiMetShifter->ApplyMEtSys(
+                                           (float)PUPPImet.px(), // uncorrected type I puppi met px (float)
+                                           (float)PUPPImet.py(), // uncorrected type I puppi met py (float)
+                                           (float)genP4.px(), // generator Z/W/Higgs px (float)
+                                           (float)genP4.py(), // generator Z/W/Higgs py (float)
+                                           (float)visgenP4.px(), // generator visible Z/W/Higgs px (float)
+                                           (float)visgenP4.py(), // generator visible Z/W/Higgs py (float)
+                                           Njets,  // number of jets (hadronic jet multiplicity) (int)
+                                           0, // shift for hadronic recoil response
+                                           0, // upward shift
+                                           shiftedMETx, // shifted type I puppi met px (float)
+                                           shiftedMETy  // shifted type I puppi met py (float)
+					   );
+      }
+      if(var == "Down") {
+        recoilPuppiMetShifter->ApplyMEtSys(
+                                           (float)PUPPImet.px(), // uncorrected type I puppi met px (float)
+                                           (float)PUPPImet.py(), // uncorrected type I puppi met py (float)
+                                           (float)genP4.px(), // generator Z/W/Higgs px (float)
+                                           (float)genP4.py(), // generator Z/W/Higgs py (float)
+                                           (float)visgenP4.px(), // generator visible Z/W/Higgs px (float)
+                                           (float)visgenP4.py(), // generator visible Z/W/Higgs py (float)
+                                           Njets,  // number of jets (hadronic jet multiplicity) (int)
+                                           0, // shift for hadronic recoil response
+                                           1, // downward shift
+                                           shiftedMETx, // shifted type I puppi met px (float)
+                                           shiftedMETy  // shifted type I puppi met py (float)
+					   );
+      }
+    }
+    else {
+      recoilPuppiMetCorrector->CorrectWithHist(
+                                               (float)PUPPImet.px(), // uncorrected type I pf met px (float)
+                                               (float)PUPPImet.py(), // uncorrected type I pf met py (float)
+                                               (float)genP4.px(), // generator Z/W/Higgs px (float)
+                                               (float)genP4.py(), // generator Z/W/Higgs py (float)
+                                               (float)visgenP4.px(), // generator visible Z/W/Higgs px (float)
+                                               (float)visgenP4.py(), // generator visible Z/W/Higgs py (float)
+                                               Njets,  // number of jets (hadronic jet multiplicity) (int)
+                                               shiftedMETx, // corrected type I pf met px (float)
+                                               shiftedMETy  // corrected type I pf met py (float)
+					       );
+    }
+    delete recoilPuppiMetCorrector;
+    delete recoilPuppiMetShifter;
+}
+
+math::XYZTLorentzVector corrector::P4Corrected(math::XYZTLorentzVector p4, int genmatch, int DM, std::string Unc, Int_t theYear){
+
+  auto year = std::to_string(theYear);
+  std::string Label;
+  if(theYear == 2016) Label = "2016Legacy";
+  else Label = year+"ReReco";
+  //
+  double ShiftP = 1.;
+  double ShiftM = 1.;
+  //
+  if(genmatch == 5) { // For genuine taus
+    TFile *TES = new TFile(("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/TauES_dm_DeepTau2017v2p1VSjet_"+Label+".root").c_str(),"READ");
+    TH1* histTES = dynamic_cast<TH1*>((const_cast<TFile*>(TES))->Get("tes"));
+    //
+    double NomTES=0;
+    double UncTES=0;
+    //
+    Int_t binTES = histTES->GetXaxis()->FindBin(DM);
+    NomTES = histTES->GetBinContent(binTES);
+    UncTES = histTES->GetBinError(binTES);
+
+    if(Unc=="Nom") {
+      ShiftP = NomTES;
+      ShiftM = NomTES;
+    }
+    else if(Unc=="Up") {
+      ShiftP = NomTES + UncTES;
+      ShiftM = NomTES + UncTES;
+    }
+    else if(Unc=="Down") {
+      ShiftP = NomTES - UncTES;
+      ShiftM = NomTES - UncTES;
+    }
+
+    if(DM==0) ShiftM = 1.; //Pion mass is not shifted
+
+    delete TES;
+    delete histTES;
+  }
+
+  else if(genmatch == 1 || genmatch == 3) { // For genuine electrons
+    TFile *FES= new TFile(("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/TauFES_eta-dm_DeepTau2017v2p1VSe_"+Label+".root").c_str(),"READ");
+    TGraph* histFES = dynamic_cast<TGraph*>((const_cast<TFile*>(FES))->Get("fes"));
+    //
+    double NomFES=0;
+    double UncFES=0;
+    //
+    if(p4.eta() <= 1.479) { //Barrel
+      if(DM==0) {
+        NomFES = histFES->GetY()[0];
+        if(Unc=="Up") UncFES = std::abs(histFES->GetErrorYhigh(0));
+        if(Unc=="Down") UncFES = -std::abs(histFES->GetErrorYlow(0));
+      }
+      if(DM==1) {
+        NomFES = histFES->GetY()[1];
+        if(Unc=="Up") UncFES = std::abs(histFES->GetErrorYhigh(1));
+        if(Unc=="Down") UncFES = -std::abs(histFES->GetErrorYlow(1));
+      }
+    }
+    if(p4.eta() > 1.479) { //Endcap
+      if(DM==0) {
+        NomFES = histFES->GetY()[2];
+        if(Unc=="Up") UncFES = std::abs(histFES->GetErrorYhigh(2));
+        if(Unc=="Down") UncFES = -std::abs(histFES->GetErrorYlow(2));
+      }
+      if(DM==1) {
+        NomFES = histFES->GetY()[3];
+        if(Unc=="Up") UncFES = std::abs(histFES->GetErrorYhigh(3));
+        if(Unc=="Down") UncFES = -std::abs(histFES->GetErrorYlow(3));
+      }
+    }
+
+    ShiftP = NomFES;
+    ShiftM = NomFES;
+    if(Unc == "Up" || Unc == "Down") {
+      ShiftP += UncFES;
+      ShiftM += UncFES;
+    }
+
+    if(DM==1) ShiftM = 1.; //Pion mass is not shifted
+
+    delete FES;
+    delete histFES;
+  }
+
+  if(genmatch==2 || genmatch==4) { // For genuine muons
+    if(Unc=="Up") {
+      ShiftP = 1.01;
+      ShiftM = 1.01;
+    }
+    if(Unc=="Down") {
+      ShiftP = 0.99;
+      ShiftM = 0.99;
+    }
+    if(DM==0) ShiftM = 1.; //Pion mass is not shifted
+  }
+
+  double px_scaled = p4.Px()*ShiftP;
+  double py_scaled = p4.Py()*ShiftP;
+  double pz_scaled = p4.Pz()*ShiftP;
+  double mass_scaled = p4.M()*ShiftM;
+  double en_scaled = std::sqrt(px_scaled*px_scaled + py_scaled*py_scaled + pz_scaled*pz_scaled + mass_scaled*mass_scaled);
+
+  return math::XYZTLorentzVector(px_scaled, py_scaled, pz_scaled, en_scaled);
+}
+
+math::XYZTLorentzVector corrector::MuP4Corrected(math::XYZTLorentzVector p4, std::string Unc)
+{
+  double scale = 0.;
+  double px_scaled = p4.Px();
+  double py_scaled = p4.Py();
+  double pz_scaled = p4.Pz();
+  double m_scaled = p4.M();
+  double E_scaled = p4.energy();
+
+  if(abs(p4.eta())<1.2) scale = 0.004;                            //barrel
+  else if(abs(p4.eta())>1.2 && abs(p4.eta())<2.1) scale = 0.009;  //near endcap
+  else if(abs(p4.eta())>2.1 && abs(p4.eta())<2.4) scale = 0.027;  //far endcap
+
+  if(Unc=="Up"){
+    px_scaled *= (1+scale);
+    py_scaled *= (1+scale);
+    pz_scaled *= (1+scale);
+    m_scaled *= (1+scale);
+    E_scaled = std::sqrt(px_scaled*px_scaled + py_scaled*py_scaled + pz_scaled*pz_scaled + m_scaled*m_scaled);
+  }
+  else if(Unc=="Down"){
+    px_scaled *= (1-scale);
+    py_scaled *= (1-scale);
+    pz_scaled *= (1-scale);
+    m_scaled *= (1-scale);
+    E_scaled = std::sqrt(px_scaled*px_scaled + py_scaled*py_scaled + pz_scaled*pz_scaled + m_scaled*m_scaled);
+  }
+
+  return math::XYZTLorentzVector(px_scaled, py_scaled, pz_scaled, E_scaled);
+}
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+
+std::map<std::string, double> weight::ZpTreweighting(const edm::Event& event, edm::EDGetTokenT<edm::View<pat::GenericParticle>> generictag, Int_t theYear, std::string sysType) {
+
+  std::map<std::string, double> ZpTreweightingmap;
+  //
+  double zptw = 1.;
+  edm::Handle<edm::View<pat::GenericParticle> > candHandle;
+
+  event.getByToken(generictag, candHandle);
+  const edm::View<pat::GenericParticle>* gens = candHandle.product();
+  math::XYZTLorentzVector genMomentum(0.,0.,0.,0.);
+  for(edm::View<pat::GenericParticle>::const_iterator igen = gens->begin(); igen!=gens->end(); ++igen) {
+    unsigned pdgid = abs(igen->pdgId());
+    unsigned status = abs(igen->status());
+    unsigned flag = igen->userInt ("generalGenFlags");
+    //
+    if((pdgid == 15 && seltools::CHECK_BIT(flag,0) && status == 2) || ((pdgid == 11 || pdgid == 13) && status == 1)) {
+      if(igen->pt() > 8) {
+	genMomentum+=igen->p4();
+      }
+    }
+  }
+  //
+  if(genMomentum.pt() != 0 && genMomentum.M() > 75 && genMomentum.M() < 120){
+    auto year = std::to_string(theYear);
+    TFile *WorkSpace=TFile::Open(("$CMSSW_BASE/src/TauPOG/TauIDSFs/data/htt_scalefactors_legacy_"+year+".root").c_str(), "READ");
+    RooWorkspace *w = (RooWorkspace*)gDirectory->Get("w");
+    WorkSpace->Close();
+    auto arg = std::vector<double>{genMomentum.pt(),genMomentum.M()};
+    zptw = std::shared_ptr<RooFunctor>(w->function("zptmass_weight_nom")->functor(w->argSet("z_gen_pt,z_gen_mass")))->eval(arg.data());
+    delete w;
+  }
+
+ZpTreweightingmap["ZpTWT"] = zptw;
+//
+if(sysType == "Nominal") {
+  ZpTreweightingmap["ZpTWTUp"] = zptw*1.1;
+  ZpTreweightingmap["ZpTWTDown"] = zptw*0.9;
+ }
+return ZpTreweightingmap;
+}
+
+std::map<std::string, double> weight::ToppTreweighting(const edm::Event& event, edm::EDGetTokenT<edm::View<pat::GenericParticle>> generictag, std::string sysType) {
+
+  std::map<std::string, double> ToppTreweightingmap;
+  //
+  double topw = 1.;
+    edm::Handle<edm::View<pat::GenericParticle> > candHandle;
+
+    event.getByToken(generictag, candHandle);
+    const edm::View<pat::GenericParticle>* gens = candHandle.product();
+    math::XYZTLorentzVector genMomentum(0.,0.,0.,0.);
+    for(edm::View<pat::GenericParticle>::const_iterator igen = gens->begin(); igen!=gens->end(); ++igen) {
+      unsigned pdgid = abs(igen->pdgId());
+      unsigned flag = igen->userInt ("generalGenFlags");
+      //
+      if(pdgid == 6 && flag == 8 && flag == 13){
+        double pt = igen->pt();
+      	pt = std::min(pt, 472.);
+      	double a = 0.088, b = -0.00087, c = 9.2e-07;
+     	topw *= std::exp(a + b * pt + c * pt*pt);
+      }
+    }
+    topw = std::sqrt(topw);
+  ToppTreweightingmap["wToppT"] = topw;
+  //
+  if(sysType == "Nominal") {
+    ToppTreweightingmap["wToppTUp"] = topw*topw;
+    ToppTreweightingmap["wToppTDown"] = 1;
+  }
+  return ToppTreweightingmap;
+}
+
+std::map<std::string, double> weight::PrefiringWeight(double pref, double prefUp, double prefDown, Int_t theYear, std::string sysType) {
+
+  std::map<std::string, double> PrefiringWeightmap;
+  //
+  double prefw = 1.;
+  if(theYear==2016 || theYear==2017) {
+    prefw = pref;
+    if(sysType == "Nominal") {
+      double prefwUp = prefUp;
+      double prefwDown = prefDown;
+      //
+      if((prefwUp/prefw)<1.2) prefwUp = prefw*1.2;
+      if((prefwDown/prefw)>0.8) prefwDown = prefw*0.8;
+      PrefiringWeightmap["wPrefiringUp"] = prefwUp;
+      PrefiringWeightmap["wPrefiringDown"] = prefwDown;
+    }
+  }
+  PrefiringWeightmap["wPrefiringWT"] = prefw;
+  //
+  return PrefiringWeightmap;
+}
+
+std::map<std::string, double> weight::TauIDSF(int genmatch, float DM, math::XYZTLorentzVector p4, Int_t theYear, bool isEmbed, std::string sysType) {
+
+  std::map<std::string, double> TauIDSFmap;
+  //
+  auto year = std::to_string(theYear);
+  std::string Label;
+  if(theYear == 2016) Label = "2016Legacy";
+  else Label = year+"ReReco";
+  //
+  auto decayMode = std::to_string(DM);
+  //
+  double t_pt=p4.Pt();
+  double t_mvadm=DM;
+  auto pt_mvadm = std::vector<double>{t_pt,t_mvadm};
+  //
+  double wIDvsJet = 1;
+  double wIDvsEle = 1;
+  double wIDvsMu = 1;
+  //
+  if(genmatch == 5) {
+    TFile *WorkSpace=TFile::Open(("$CMSSW_BASE/src/TauPOG/TauIDSFs/data/htt_scalefactors_legacy_"+year+".root").c_str(), "READ");
+    RooWorkspace *w = (RooWorkspace*)gDirectory->Get("w");
+    WorkSpace->Close();
+    if(!isEmbed) {
+      wIDvsJet = std::shared_ptr<RooFunctor>(w->function("t_deeptauid_mvadm_medium")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+    }
+    else wIDvsJet = std::shared_ptr<RooFunctor>(w->function("t_deeptauid_mvadm_embed_medium")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+    delete w;
+  }
+  else if(genmatch == 1 || genmatch == 3) {
+    TauIDSFTool *tauSFvsEle=new TauIDSFTool(Label,"DeepTau2017v2p1VSe","VVLoose");
+    wIDvsEle = tauSFvsEle->getSFvsEta(abs(p4.Eta()),genmatch);
+    delete tauSFvsEle;
+  }
+  else if(genmatch == 2 || genmatch == 4) {
+    TauIDSFTool *tauSFvsMu=new TauIDSFTool(Label,"DeepTau2017v2p1VSmu","Tight");
+    wIDvsMu = tauSFvsMu->getSFvsEta(abs(p4.Eta()),genmatch);
+    delete tauSFvsMu;
+  }
+  TauIDSFmap["wIDvsJet"] = wIDvsJet;
+  TauIDSFmap["wIDvsEle"] = wIDvsEle;
+  TauIDSFmap["wIDvsMu"] = wIDvsMu;
+
+  if(sysType == "Nominal") {
+    double wIDvsJetUp = 1;
+    double wIDvsJetDown = 1;
+    double wIDvsEleUp = 1;
+    double wIDvsEleDown = 1;
+    double wIDvsMuUp = 1;
+    double wIDvsMuDown = 1;
+    //
+    if(genmatch == 5) {
+      TFile *WorkSpace=TFile::Open(("$CMSSW_BASE/src/TauPOG/TauIDSFs/data/htt_scalefactors_legacy_"+year+".root").c_str(), "READ");
+      RooWorkspace *w = (RooWorkspace*)gDirectory->Get("w");
+      WorkSpace->Close();
+      if(!isEmbed) {
+        wIDvsJetUp = std::shared_ptr<RooFunctor>(w->function(("t_deeptauid_mvadm_medium_highpt_mvadm"+decayMode+"_up").c_str())->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+	wIDvsJetDown = std::shared_ptr<RooFunctor>(w->function(("t_deeptauid_mvadm_medium_highpt_mvadm"+decayMode+"_down").c_str())->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+      }
+      else {
+        wIDvsJetUp = std::shared_ptr<RooFunctor>(w->function(("t_deeptauid_mvadm_embed_medium_highpt_mvadm"+decayMode+"_up").c_str())->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+        wIDvsJetDown = std::shared_ptr<RooFunctor>(w->function(("t_deeptauid_mvadm_embed_medium_highpt_mvadm"+decayMode+"_down").c_str())->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+      }
+      delete w;
+    }
+    else if(genmatch == 1 || genmatch == 3) {
+      TauIDSFTool *tauSFvsEle=new TauIDSFTool(Label,"DeepTau2017v2p1VSe","VVLoose");
+      wIDvsEleUp = tauSFvsEle->getSFvsEta(abs(p4.Eta()),genmatch,"Up");
+      wIDvsEleDown = tauSFvsEle->getSFvsEta(abs(p4.Eta()),genmatch,"Down");
+      delete tauSFvsEle;
+    }
+    else if(genmatch == 2 || genmatch == 4) {
+      TauIDSFTool *tauSFvsMu=new TauIDSFTool(Label,"DeepTau2017v2p1VSmu","Tight");
+      wIDvsMuUp = tauSFvsMu->getSFvsEta(abs(p4.Eta()),genmatch,"Up");
+      wIDvsMuDown = tauSFvsMu->getSFvsEta(abs(p4.Eta()),genmatch,"Down");
+      delete tauSFvsMu;
+    }
+    TauIDSFmap["wIDvsJetUp"] = wIDvsJetUp;
+    TauIDSFmap["wIDvsJetDown"] = wIDvsJetDown;
+    TauIDSFmap["wIDvsEleUp"] = wIDvsEleUp;
+    TauIDSFmap["wIDvsEleDown"] = wIDvsEleDown;
+    TauIDSFmap["wIDvsMuUp"] = wIDvsMuUp;
+    TauIDSFmap["wIDvsMuDOwn"] = wIDvsMuDown;
+  }
+  return TauIDSFmap;
+}
+
+std::map<std::string, double> weight::MuonIDTrkSF(math::XYZTLorentzVector p4, double m_iso, bool isEmbed, Int_t theYear) {
+
+  std::map<std::string, double> MuonIDTrkSFmap;
+  //
+  auto year = std::to_string(theYear);
+  //
+  double m_pt = p4.Pt();
+  double m_eta = p4.Eta();
+  auto pt_eta_iso = std::vector<double>{m_pt,m_eta,m_iso};
+  auto eta = std::vector<double>{m_eta};
+  //
+  double wID = 1;
+  double wTrk = 1;
+  //
+  TFile *WorkSpace=TFile::Open(("$CMSSW_BASE/src/TauPOG/TauIDSFs/data/htt_scalefactors_legacy_"+year+".root").c_str(), "READ");
+  RooWorkspace *w = (RooWorkspace*)gDirectory->Get("w");
+  WorkSpace->Close();
+  //
+  if(!isEmbed) {
+    wID = std::shared_ptr<RooFunctor>(w->function("m_idiso_binned_ic_ratio")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+  }
+  else wID = std::shared_ptr<RooFunctor>(w->function("m_idiso_binned_ic_embed_ratio")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+  //
+  wTrk = std::shared_ptr<RooFunctor>(w->function("m_trk_ratio")->functor(w->argSet("m_eta")))->eval(eta.data());
+
+  MuonIDTrkSFmap["wID"] = wID;
+  MuonIDTrkSFmap["wTrk"] = wTrk;
+
+  delete w;
+  return MuonIDTrkSFmap;
+}
+
+std::map<std::string, double> weight::TriggerSF(int genmatch, float DM, math::XYZTLorentzVector taup4, double m_iso, math::XYZTLorentzVector mup4, Int_t theYear, bool isEmbed, std::string sysType) {
+
+  std::map<std::string, double> TriggerSFmap;
+  //
+  auto year = std::to_string(theYear);
+  auto decayMode = std::to_string(DM);
+  //
+  double t_pt=taup4.Pt();
+  double t_mvadm=DM;
+  auto pt_mvadm = std::vector<double>{t_pt,t_mvadm};
+  //
+  double m_pt = mup4.Pt();
+  double m_eta = mup4.Eta();
+  auto pt_eta_iso = std::vector<double>{m_pt,m_eta,m_iso};
+  //
+  bool m_high_pT = (m_pt > 25.);
+  if(theYear == 2016) m_high_pT = (m_pt > 23.);
+  //
+  TFile *WorkSpace=TFile::Open(("$CMSSW_BASE/src/TauPOG/TauIDSFs/data/htt_scalefactors_legacy_"+year+".root").c_str(), "READ");
+  RooWorkspace *w = (RooWorkspace*)gDirectory->Get("w");
+  WorkSpace->Close();
+  //
+  double m_trg = 1;
+  double m_trg_mc = 1;
+  //
+  m_trg = std::shared_ptr<RooFunctor>(w->function("m_trg_binned_ic_data")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+  if(!isEmbed) {
+    m_trg_mc = std::shared_ptr<RooFunctor>(w->function("m_trg_binned_ic_mc")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+  }
+  else m_trg_mc = std::shared_ptr<RooFunctor>(w->function("m_trg_binned_ic_embed")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+  //
+  double m_xtrg = 1;
+  double m_xtrg_mc =1;
+  if(theYear == 2016) {
+    m_xtrg = std::shared_ptr<RooFunctor>(w->function("m_trg_19_binned_ic_data")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+    if(!isEmbed) {
+      m_xtrg_mc = std::shared_ptr<RooFunctor>(w->function("m_trg_19_binned_ic_mc")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+    }
+    else m_xtrg_mc = std::shared_ptr<RooFunctor>(w->function("m_trg_19_binned_ic_embed")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+  }
+  if (theYear == 2017 || theYear == 2018) {
+    m_xtrg = std::shared_ptr<RooFunctor>(w->function("m_trg_19_binned_ic_data")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+    if(!isEmbed) {
+      m_xtrg_mc = std::shared_ptr<RooFunctor>(w->function("m_trg_19_binned_ic_mc")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+    }
+    else m_xtrg_mc = std::shared_ptr<RooFunctor>(w->function("m_trg_19_binned_ic_embed")->functor(w->argSet("m_pt,m_eta,m_iso")))->eval(pt_eta_iso.data());
+  }
+  //
+  double t_trg = 1;
+  if(!isEmbed) {
+    t_trg = std::shared_ptr<RooFunctor>(w->function("t_trg_ic_deeptau_medium_mvadm_mutau_ratio")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+  }
+  else t_trg = std::shared_ptr<RooFunctor>(w->function("t_trg_ic_deeptau_medium_mvadm_mutau_embed_ratio")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+  //
+  double single_m_sf = m_trg/m_trg_mc;
+  double xtrg_mt_sf = m_xtrg/m_xtrg_mc*t_trg;
+  //
+  double xtrg_OR_sf = m_high_pT ? single_m_sf : xtrg_mt_sf;
+  TriggerSFmap["wTrg"] = xtrg_OR_sf;
+
+  if(sysType == "Nominal") {
+    double t_trg_Up = 1;
+    double t_trg_Down = 1;
+    if(!m_high_pT) { // otherwise use single trigger weight which is 1 !
+      if(!isEmbed && std::shared_ptr<RooFunctor>(w->function("t_trg_ic_deeptau_medium_mvadm_mutau_ratio")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data()) > 0) {
+	t_trg_Up = std::shared_ptr<RooFunctor>(w->function(("t_trg_ic_deeptau_medium_mvadm_mutau_ratio_mvadm"+decayMode+"_up").c_str())->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data()) /
+	  std::shared_ptr<RooFunctor>(w->function("t_trg_ic_deeptau_medium_mvadm_mutau_ratio")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+	t_trg_Down = std::shared_ptr<RooFunctor>(w->function(("t_trg_ic_deeptau_medium_mvadm_mutau_ratio_mvadm"+decayMode+"_down").c_str())->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data()) /
+	  std::shared_ptr<RooFunctor>(w->function("t_trg_ic_deeptau_medium_mvadm_mutau_ratio")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+      }
+      else if (std::shared_ptr<RooFunctor>(w->function("t_trg_ic_deeptau_medium_mvadm_mutau_embed_ratio")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data()) > 0){
+	t_trg_Up = std::shared_ptr<RooFunctor>(w->function(("t_trg_ic_deeptau_medium_mvadm_mutau_embed_ratio_mvadm"+decayMode+"_up").c_str())->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data()) /
+	  std::shared_ptr<RooFunctor>(w->function("t_trg_ic_deeptau_medium_mvadm_mutau_embed_ratio")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+        t_trg_Down = std::shared_ptr<RooFunctor>(w->function(("t_trg_ic_deeptau_medium_mvadm_mutau_embed_ratio_mvadm"+decayMode+"_down").c_str())->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data()) /
+	  std::shared_ptr<RooFunctor>(w->function("t_trg_ic_deeptau_medium_mvadm_mutau_embed_ratio")->functor(w->argSet("t_pt,t_mvadm")))->eval(pt_mvadm.data());
+      }
+    }
+    TriggerSFmap["wTrgUp"] = std::isnan(t_trg_Up) ? 0 : t_trg_Up;
+    TriggerSFmap["wTrgDown"] = std::isnan(t_trg_Down) ? 0 : t_trg_Down;
+  }
+  return TriggerSFmap;
+}
+
+std::map<std::string, double> weight::BTaggingSF(std::vector<const pat::Jet*> selectedJets, Int_t theYear, std::string sysType) {
+
+  std::map<std::string, double> BTaggingSFmap;
+  //
+  std::string inputCSVfile = "";
+  TFile *inputROOTfile = nullptr;
+  TH2D *btagEfficiency = nullptr;
+  double CSVcut = 0.;
+  //
+  if(theYear == 2016) {
+    inputCSVfile = "$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/DeepCSV_2016LegacySF_WP_V1.csv";
+    inputROOTfile = TFile::Open("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/eta_pt_btagEff_2016.root");
+    //
+    CSVcut = 0.6321;
+    btagEfficiency = (TH2D*)inputROOTfile->Get("eta_pt_eff");
+  }
+  else if(theYear == 2017) {
+    inputCSVfile = "$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/DeepCSV_94XSF_WP_V4_B_F.csv";
+    inputROOTfile = TFile::Open("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/eta_pt_btagEff_2017.root");
+    //
+    CSVcut = 0.4941;
+    btagEfficiency = (TH2D*)inputROOTfile->Get("eta_pt_eff");
+  }
+  else if(theYear == 2018) {
+    inputCSVfile = "$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/DeepCSV_102XSF_WP_V1.csv";
+    inputROOTfile = TFile::Open("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/eta_pt_btagEff_2018.root");
+    //
+    CSVcut = 0.4184;
+    btagEfficiency = (TH2D*)inputROOTfile->Get("eta_pt_eff");
+  }
+  delete inputROOTfile;
+  delete btagEfficiency;
+  //
+  BTagCalibration calib("deepcsv", inputCSVfile);
+  BTagCalibrationReader reader(BTagEntry::OP_MEDIUM,  // operating point
+                               "central",            // central sys type
+                               {"up", "down"});      // other sys types
+  //
+  reader.load(calib,                // calibration instance
+              BTagEntry::FLAV_B,    // btag flavour
+              "comb");              // measurement type
+  //
+  double P_mc = 1.;
+  double P_data = 1.;
+  double P_dataUp = 1.;
+  double P_dataDown = 1.;
+  for(std::vector<const pat::Jet*>::iterator iJet = selectedJets.begin(); iJet != selectedJets.end(); ++iJet) {
+    //
+    double SF = reader.eval_auto_bounds("central", BTagEntry::FLAV_B, std::abs((*iJet)->eta()), (*iJet)->pt());
+    double epsilon = btagEfficiency->GetBinContent((*iJet)->pt(), (*iJet)->eta());
+    if(((*iJet)->bDiscriminator("pfDeepCSVJetTags:probb") + (*iJet)->bDiscriminator("pfDeepCSVJetTags:probbb"))>CSVcut && (*iJet)->pt()>20 && abs((*iJet)->eta())<2.4) {
+      P_mc *= epsilon;
+      P_data *= SF*epsilon;
+    }
+    else {
+      P_mc *= (1 - epsilon);
+      P_data *= (1 - SF*epsilon);
+    }
+    //
+    if(sysType == "Nominal") {
+      //
+      double SFUp = reader.eval_auto_bounds("up", BTagEntry::FLAV_B, std::abs((*iJet)->eta()), (*iJet)->pt());
+      double SFDown = reader.eval_auto_bounds("down", BTagEntry::FLAV_B, std::abs((*iJet)->eta()), (*iJet)->pt());
+      if(((*iJet)->bDiscriminator("pfDeepCSVJetTags:probb") + (*iJet)->bDiscriminator("pfDeepCSVJetTags:probbb"))>CSVcut && (*iJet)->pt()>20 && abs((*iJet)->eta())<2.4) {
+        P_dataUp *= SFUp*epsilon;
+        P_dataDown *= SFDown*epsilon;
+      }
+      else {
+        P_dataUp *= (1 - SFUp*epsilon);
+        P_dataDown *= (1 - SFDown*epsilon);
+      }
+    }
+  }
+  BTaggingSFmap["wBtag"] = P_data/P_mc;
+  if(sysType == "Nominal") {
+    BTaggingSFmap["wBtagUp"] = P_dataUp/P_mc;
+    BTaggingSFmap["wBtagDown"] = P_dataDown/P_mc;
+  }
+  return BTaggingSFmap;
+}
+
+double weight::PileUpreweighting(Int_t theYear, int id, float nPU) {
+
+  double wPU = 1.;
+  TFile *filePUdistribution_data = nullptr;
+  TFile *filePUdistribution_MC = nullptr;
+  PileUp *PUofficial = new PileUp();
+  TH1D *PU_data = nullptr;
+  TH1D *PU_mc = nullptr;
+  //
+  if(theYear == 2016) {
+    filePUdistribution_data=TFile::Open("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/Data_Pileup_2016_271036-284044_80bins.root", "READ");
+    filePUdistribution_MC=TFile::Open("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/MC_Moriond17_PU25ns_V1.root", "READ");
+    //
+    PU_data=(TH1D*)filePUdistribution_data->Get("pileup");
+    PU_mc=(TH1D*)filePUdistribution_MC->Get("pileup");
+    PUofficial->set_h_data(PU_data);
+    PUofficial->set_h_MC(PU_mc);
+  }
+  if(theYear == 2017) {
+    filePUdistribution_data=TFile::Open("LLRHiggsTauTau/NtupleProducer/data/pu_distributions_data_2017.root", "READ");
+    if(id==DataMCType::DY_ll) filePUdistribution_MC=TFile::Open("LLRHiggsTauTau/NtupleProducer/data/pileup_2017_DYJetsToLL-LO.root", "READ");
+    else if(id=DataMCType::W_3qlnu) filePUdistribution_MC=TFile::Open("LLRHiggsTauTau/NtupleProducer/data/pileup_2017_W3JetsToLNu-LO.root", "READ");
+    else if(id==DataMCType::WW_1l1nu2q) filePUdistribution_MC=TFile::Open("LLRHiggsTauTau/NtupleProducer/data/pileup_2017_WWTo1L1Nu2Q.root", "READ");
+    else if(id==DataMCType::WminusH_tautau) filePUdistribution_MC=TFile::Open("LLRHiggsTauTau/NtupleProducer/data/pileup_2017_WminusHToTauTau_M-125.root", "READ");
+    else if(id==DataMCType::WplusH_tautau) filePUdistribution_MC=TFile::Open("LLRHiggsTauTau/NtupleProducer/data/pileup_2017_WplusHToTauTau_M-125.root", "READ");
+    else filePUdistribution_MC=TFile::Open("LLRHiggsTauTau/NtupleProducer/data/pileup_2017_DYJetsToLL-ext.root", "READ");
+    //
+    PU_data=(TH1D*)filePUdistribution_data->Get("pileup");
+    PU_mc=(TH1D*)filePUdistribution_MC->Get("pileup");
+    PUofficial->set_h_data(PU_data);
+    PUofficial->set_h_MC(PU_mc);
+  }
+  if(theYear == 2018) {
+    filePUdistribution_data=TFile::Open("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/pileUp_data_Autumn18.root", "READ");
+    filePUdistribution_MC=TFile::Open("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/pileUp_MC_Autumn18.root", "READ");
+    //
+    PU_data=(TH1D *)filePUdistribution_data->Get("pileup");
+    PU_mc=(TH1D *)filePUdistribution_MC->Get("pileup");
+    PUofficial->set_h_data(PU_data);
+    PUofficial->set_h_MC(PU_mc);
+  }
+  delete filePUdistribution_data;
+  delete filePUdistribution_MC;
+  delete PUofficial;
+  delete PU_data;
+  delete PU_mc;
+  //
+  wPU = double(PUofficial->get_PUweight(double(nPU)));
+  return wPU;
+}
