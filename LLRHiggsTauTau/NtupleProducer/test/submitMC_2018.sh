@@ -2,6 +2,7 @@
 
 ##MC
 sed -i 's/.*IsMC=.*/IsMC=True/g' analyzer.py
+sed -i 's/.*IsEmbed=.*/IsEmbed=False/g' analyzer.py
 
 ##TTbar
 sed -i 's/.*DataMCType.*/				       DataMCType    = cms.untracked.string("ttbar_dilep")/g' ../python/HiggsTauTauProducer.py
@@ -33,8 +34,10 @@ sed -i 's/.*DataMCType.*/                                      DataMCType    = c
 crab submit config2018/WZ/crab3_WZ_2l2q_2018.py
 
 sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("WZ_3l1nu")/g' ../python/HiggsTauTauProducer.py
-crab submit config2018/WZ/crab3_WZ_3l1nu_2018.py
-#crab submit crab3_WZ_3l1nu_2_2018.py
+crab submit config2018/WZ/crab3_WZ_3l1nu_v1_2018.py
+
+sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("WZ_3l1nu")/g' ../python/HiggsTauTauProducer.py
+crab submit config2018/WZ/crab3_WZ_3l1nu_v2_2018.py
 
 sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("WZ_1l3nu")/g' ../python/HiggsTauTauProducer.py
 crab submit config2018/WZ/crab3_WZ_1l3nu_2018.py
@@ -49,8 +52,10 @@ sed -i 's/.*DataMCType.*/				       DataMCType    = cms.untracked.string("ZZ_4l"
 crab submit config2018/ZZ/crab3_ZZ_4l_2018.py
 
 sed -i 's/.*DataMCType.*/				       DataMCType    = cms.untracked.string("ZZ_2l2nu")/g' ../python/HiggsTauTauProducer.py
-crab submit config2018/ZZ/crab3_ZZ_2l2nu_2018.py
-#crab submit crab3_ZZ_2l2nu_2018_2.py
+crab submit config2018/ZZ/crab3_ZZ_2l2nu_v1_2018.py
+
+sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("ZZ_2l2nu")/g' ../python/HiggsTauTauProducer.py
+crab submit config2018/ZZ/crab3_ZZ_2l2nu_v2_2018.py
 
 sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("ZZ_2l2q")/g' ../python/HiggsTauTauProducer.py
 crab submit config2018/ZZ/crab3_ZZ_2l2q_2018.py
@@ -78,14 +83,6 @@ crab submit config2018/singleTop/crab3_ST_tchannel_top_2018.py
 
 sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("ST_tchannel_antitop")/g' ../python/HiggsTauTauProducer.py
 crab submit config2018/singleTop/crab3_ST_tchannel_antitop_2018.py
-
-#########
-
-#sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("H_WW_2l2nu_ggF")/g' #../python/HiggsTauTauProducer.py
-#crab submit crab3_H_WW_2l2nu_ggF_2016.py
-
-#sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("H_WW_2l2nu_VBF")/g' #../python/HiggsTauTauProducer.py
-#crab submit crab3_H_WW_2l2nu_VBF_2016.py
 
 #########
 ##signal

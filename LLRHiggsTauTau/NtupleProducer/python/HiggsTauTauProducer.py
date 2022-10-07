@@ -18,7 +18,7 @@ except NameError:
     YEAR = 2018
 try: PERIOD
 except:
-    PERIOD ="A"
+    PERIOD=""
 print 'Year+Period:', str(YEAR)+PERIOD
 try: doCPVariables
 except NameError:

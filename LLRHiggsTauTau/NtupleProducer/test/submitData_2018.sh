@@ -1,19 +1,18 @@
 #!/bin/bash
 
-source /cvmfs/cms.cern.ch/crab3/crab.sh
-eval 'scramv1 runtime -sh'
-
-
-##MC
+##Data
 sed -i 's/.*IsMC=.*/IsMC=False/g' analyzer.py
+sed -i 's/.*IsEmbed=.*/IsEmbed=False/g' analyzer.py
+sed -i 's/.*PERIOD =.*/PERIOD = '\'' '\''/g' analyzer.py
 
+crab submit config2018/data/crab3_SingleMuonA_2018.py
 
-crab submit config2018/data/crab3_DataA_2017.py
+crab submit config2018/data/crab3_SingleMuonB_2018.py
 
-crab submit config2018/data/crab3_DataB_2017.py
+crab submit config2018/data/crab3_SingleMuonC_2018.py
 
-crab submit config2018/data/crab3_DataC_2017.py
+sed -i 's/.*PERIOD =.*/PERIOD = '\''D'\''/g' analyzer.py
 
-#crab submit crab3_DataE_2017.py
+crab submit config2018/data/crab3_SingleMuonD_2018.py
 
 

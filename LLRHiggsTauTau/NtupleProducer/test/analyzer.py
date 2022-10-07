@@ -8,7 +8,7 @@ PyFilePath = os.environ['CMSSW_BASE']+"/src/LLRHiggsTauTau/NtupleProducer/"
 
 # Year/Period
 YEAR   = 2018
-PERIOD = ' ' # use 'D' for 2018D (prompt GT instead of ReReco GT), can be left empty if running on 2018ABC
+PERIOD = 'D'
 
 #samples list (it could be moved to a cfg file for better reading
 #samples = [
@@ -37,8 +37,8 @@ COMPUTEUPDOWNSVFIT=False # compute SVfit for up/down TES variation
 COMPUTEMETUPDOWNSVFIT=False # compute SVfit for up/down MET JES variation
 doCPVariables=False # compute CP variables and PV refit
 COMPUTEQGVAR = False # compute QG Tagger for jets
-IsMC=True
-IsEmbed=False
+IsMC=False
+IsEmbed=True
 Is25ns=True
 HLTProcessName='HLT' #Different names possible, check e.g. at https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD.
 if not IsMC:
