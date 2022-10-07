@@ -1506,8 +1506,8 @@ private:
   TTree *RelativeSample_YEARDown;
 
   std::map<std::string, TTree*> SystematicsMap {
-    {"Nominal",  Nominal}
-    /*{"TESUp",  TESUp},
+    {"Nominal",  Nominal},
+    {"TESUp",  TESUp},
     {"TESDown",  TESDown}, 
     {"MESUp",  MESUp}, 
     {"MESDown",  MESDown}, 
@@ -1538,7 +1538,7 @@ private:
     {"HF_YEARUp",  HF_YEARUp}, 
     {"HF_YEARDown",  HF_YEARDown}, 
     {"RelativeSample_YEARUp",  RelativeSample_YEARUp}, 
-    {"RelativeSample_YEARDown",  RelativeSample_YEARDown}*/
+    {"RelativeSample_YEARDown",  RelativeSample_YEARDown}
   };
 
 };
