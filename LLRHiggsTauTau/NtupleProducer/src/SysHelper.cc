@@ -187,8 +187,8 @@ SysHelper::SysHelper(Int_t theYear, TString dataMCstring)
     //_btagCalib = new const BTagCalibration("deepcsv", "/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/b_tag/DeepCSV_94XSF_V5_B_F.csv"); //PRODUIRE LES EFF MAP
   }
   else if(theYear == 2018) {
-    _btagCalib = new const BTagCalibration("deepcsv", "/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/b_tag/DeepCSV_102XSF_V1.csv");
-    //_btagCalib = new const BTagCalibration("deepcsv", "src/LLRHiggsTauTau/NtupleProducer/data/b_tag/DeepCSV_102XSF_V1.csv");
+    //_btagCalib = new const BTagCalibration("deepcsv", "/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/b_tag/DeepCSV_102XSF_V1.csv");
+    _btagCalib = new const BTagCalibration("deepcsv", "src/LLRHiggsTauTau/NtupleProducer/data/b_tag/DeepCSV_102XSF_V1.csv");
   }
   _btagReader = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up","down"});
   _btagReader->load(*_btagCalib, BTagEntry::FLAV_B, "comb");
