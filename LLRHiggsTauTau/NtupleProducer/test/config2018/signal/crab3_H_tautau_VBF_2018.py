@@ -18,8 +18,8 @@ config.Data.inputDataset = "/VBFHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5
 config.Data.inputDBS = 'global'
 config.Data.splitting = "EventAwareLumiBased"
 config.Data.unitsPerJob = 5000
-config.Data.totalUnits = 200000 #number of event
-config.Data.outLFNDirBase = '/store/user/msessini/Prod_2018_v3'
+config.Data.totalUnits = -1 #number of event
+config.Data.outLFNDirBase= '/store/user/msessini/Prod_Octobre22'
 config.Data.outputDatasetTag = "H_tautau_VBF_2018"
 
 config.section_("Site")
