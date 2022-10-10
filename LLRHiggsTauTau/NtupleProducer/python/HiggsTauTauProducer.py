@@ -18,7 +18,7 @@ except NameError:
     YEAR = 2018
 try: PERIOD
 except:
-    PERIOD=""
+    PERIOD ="A"
 print 'Year+Period:', str(YEAR)+PERIOD
 try: doCPVariables
 except NameError:
@@ -588,7 +588,10 @@ process.load("GeneratorInterface.TauolaInterface.TauSpinner_cfi")
 process.TauSpinnerReco.LHAPDFname = cms.untracked.string('NNPDF30_nlo_as_0118')
 process.TauSpinnerReco.CMSEnergy = cms.double(13000.0)
 
-process.taus=cms.Sequence(process.TauSpinnerReco + process.rerunMvaIsolationSequence + process.slimmedTausNewID + process.bareTaus + process.softTaus)
+if IsMC or IsEmbed:
+	process.taus=cms.Sequence(process.TauSpinnerReco + process.rerunMvaIsolationSequence + process.slimmedTausNewID + process.bareTaus + process.softTaus)
+else:
+        process.taus=cms.Sequence(process.rerunMvaIsolationSequence + process.slimmedTausNewID + process.bareTaus + process.softTaus)
 
 ### ----------------------------------------------------------------------
 ### gen info, only from MC
