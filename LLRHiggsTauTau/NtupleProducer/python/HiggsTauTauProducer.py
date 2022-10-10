@@ -1097,7 +1097,7 @@ process.EvntCounterA = cms.EDAnalyzer('EventCounter',
                                       gensrccounter = cms.InputTag('prunedGenParticles'),
                                       GenEventInfo   = cms.InputTag('generator'),
                                       IsEmbed= cms.bool(IsEmbed),
-                                      DataMCType    = cms.untracked.string("DY_2qll")
+                                      DataMCType    = cms.untracked.string("DY_ll")
 )
 
 

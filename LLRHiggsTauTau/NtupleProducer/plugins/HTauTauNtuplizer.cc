@@ -1506,8 +1506,8 @@ private:
   TTree *RelativeSample_YEARDown;
 
   std::map<std::string, TTree*> SystematicsMap {
-    {"Nominal",  Nominal}
-    /*{"TESUp",  TESUp},
+    {"Nominal",  Nominal},
+    {"TESUp",  TESUp},
     {"TESDown",  TESDown}, 
     {"MESUp",  MESUp}, 
     {"MESDown",  MESDown}, 
@@ -1538,7 +1538,7 @@ private:
     {"HF_YEARUp",  HF_YEARUp}, 
     {"HF_YEARDown",  HF_YEARDown}, 
     {"RelativeSample_YEARUp",  RelativeSample_YEARUp}, 
-    {"RelativeSample_YEARDown",  RelativeSample_YEARDown}*/
+    {"RelativeSample_YEARDown",  RelativeSample_YEARDown}
   };
 
 };
@@ -3042,8 +3042,8 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
   else if (theYear == 2018)
     {
       for (const auto& source: m_jec_sources_regrouped_2018) {
-	//JetCorrectorParameters source_parameters_reduced("src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Regrouped_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt", source);
-        JetCorrectorParameters source_parameters_reduced("/opt/sbg/cms/safe1/cms/msessini/MuTauProducer/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Regrouped_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt", source);
+	JetCorrectorParameters source_parameters_reduced("src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Regrouped_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt", source);
+        //JetCorrectorParameters source_parameters_reduced("/opt/sbg/cms/safe1/cms/msessini/MuTauProducer/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Regrouped_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt", source);
 	std::unique_ptr<JetCorrectionUncertainty> source_uncertainty_reduced(new JetCorrectionUncertainty(source_parameters_reduced));
 	jecSourceUncRegroupedProviders.emplace(source, std::move(source_uncertainty_reduced));
       }
@@ -3072,8 +3072,8 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
       else if (theYear == 2018)
 	{
 	  for (const auto& source: m_jec_sources_2018) {
-	    //JetCorrectorParameters source_parameters("src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt", source);
-            JetCorrectorParameters source_parameters("/opt/sbg/cms/safe1/cms/msessini/MuTauProducer/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt", source);
+	    JetCorrectorParameters source_parameters("src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt", source);
+            //JetCorrectorParameters source_parameters("/opt/sbg/cms/safe1/cms/msessini/MuTauProducer/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt", source);
 	    std::unique_ptr<JetCorrectionUncertainty> source_uncertainty(new JetCorrectionUncertainty(source_parameters));
 	    jecSourceUncProviders.emplace(source, std::move(source_uncertainty));
 	  }
@@ -3101,35 +3101,32 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
 	}
       }else if(Run2017B){
 	for (const auto& source: m_jec_sources_2017) {
-	  //JetCorrectorParameters source_parameters("JECUncertaintySources/Fall17_17Nov2017B_V32_DATA_UncertaintySources_AK4PFchs.txt", source);
 	  JetCorrectorParameters source_parameters("src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Fall17_17Nov2017B_V32_DATA_UncertaintySources_AK4PFchs.txt", source);
 	  std::unique_ptr<JetCorrectionUncertainty> source_uncertainty(new JetCorrectionUncertainty(source_parameters));
 	  jecSourceUncProviders.emplace(source, std::move(source_uncertainty));
 	}
       }else if(Run2017C){
 	for (const auto& source: m_jec_sources_2017) {
-	  //JetCorrectorParameters source_parameters("JECUncertaintySources/Fall17_17Nov2017C_V32_DATA_UncertaintySources_AK4PFchs.txt", source);
 	  JetCorrectorParameters source_parameters("src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Fall17_17Nov2017C_V32_DATA_UncertaintySources_AK4PFchs.txt", source);
 	  std::unique_ptr<JetCorrectionUncertainty> source_uncertainty(new JetCorrectionUncertainty(source_parameters));
 	  jecSourceUncProviders.emplace(source, std::move(source_uncertainty));
 	}
       }else if(Run2017D || Run2017E){
 	for (const auto& source: m_jec_sources_2017) {
-	  //JetCorrectorParameters source_parameters("JECUncertaintySources/Fall17_17Nov2017DE_V32_DATA_UncertaintySources_AK4PFchs.txt", source);
 	  JetCorrectorParameters source_parameters("src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Fall17_17Nov2017DE_V32_DATA_UncertaintySources_AK4PFchs.txt", source);
 	  std::unique_ptr<JetCorrectionUncertainty> source_uncertainty(new JetCorrectionUncertainty(source_parameters));
 	  jecSourceUncProviders.emplace(source, std::move(source_uncertainty));
 	}
       }else if(Run2017F){
 	for (const auto& source: m_jec_sources_2017) {
-	  //JetCorrectorParameters source_parameters("JECUncertaintySources/Fall17_17Nov2017F_V32_DATA_UncertaintySources_AK4PFchs.txt", source);
 	  JetCorrectorParameters source_parameters("src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Fall17_17Nov2017F_V32_DATA_UncertaintySources_AK4PFchs.txt", source);
 	  std::unique_ptr<JetCorrectionUncertainty> source_uncertainty(new JetCorrectionUncertainty(source_parameters));
 	  jecSourceUncProviders.emplace(source, std::move(source_uncertainty));
 	}
       }else if(Run2018A){
 	for (const auto& source: m_jec_sources_2018) {
-	  JetCorrectorParameters source_parameters("/opt/sbg/cms/safe1/cms/msessini/MuTauProducer/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Autumn18_RunA_V19_DATA_UncertaintySources_AK4PFchs.txt", source);
+          JetCorrectorParameters source_parameters("src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Autumn18_RunA_V19_DATA_UncertaintySources_AK4PFchs.txt", source);
+	  //JetCorrectorParameters source_parameters("/opt/sbg/cms/safe1/cms/msessini/MuTauProducer/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/JECUncertaintySources/Autumn18_RunA_V19_DATA_UncertaintySources_AK4PFchs.txt", source);
 	  std::unique_ptr<JetCorrectionUncertainty> source_uncertainty(new JetCorrectionUncertainty(source_parameters));
 	  jecSourceUncProviders.emplace(source, std::move(source_uncertainty));
 	}
@@ -3214,16 +3211,6 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
   if(_metfilterbit!=127) METFilters=false;
   if (!METFilters) return;
 
-  //Theoretical Uncertainties
-  std::map<std::string, double> TheoreticalUncmap;
-  TheoreticalUncmap["wMC"]        =  _MC_weight;
-  TheoreticalUncmap["wPSISRUp"]   =  _TheoreticalPSUnc[6]/_MC_weight;
-  TheoreticalUncmap["wPSISRDown"] =  _TheoreticalPSUnc[8]/_MC_weight;
-  TheoreticalUncmap["wPSFSRUp"]   =  _TheoreticalPSUnc[7]/_MC_weight;
-  TheoreticalUncmap["wPSFSRDown"] =  _TheoreticalPSUnc[9]/_MC_weight;
-  TheoreticalUncmap["wScaleUp"]   =  _TheoreticalScaleUncTab[13]/_nominal_wt;
-  TheoreticalUncmap["wScaleDown"] =  _TheoreticalScaleUncTab[17]/_nominal_wt;
-
   mySysHelper->GetCollections(cands, daus, Smearedjets, SmearedjetsUp, SmearedjetsDown);
   if(!Event_isRealData) {
     Handle <double> tauSpinnerWTEvenHandle;
@@ -3238,6 +3225,16 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
     event.getByToken(theTauSpinnerWTMMtag,tauSpinnerWTMMHandle);
     const double tauSpinnerWTMM = (*tauSpinnerWTMMHandle.product());
 
+    //Theoretical Uncertainties
+    std::map<std::string, double> TheoreticalUncmap;
+    TheoreticalUncmap["wMC"]        =  _MC_weight;
+    TheoreticalUncmap["wPSISRUp"]   =  _TheoreticalPSUnc[6]/_MC_weight;
+    TheoreticalUncmap["wPSISRDown"] =  _TheoreticalPSUnc[8]/_MC_weight;
+    TheoreticalUncmap["wPSFSRUp"]   =  _TheoreticalPSUnc[7]/_MC_weight;
+    TheoreticalUncmap["wPSFSRDown"] =  _TheoreticalPSUnc[9]/_MC_weight;
+    TheoreticalUncmap["wScaleUp"]   =  _TheoreticalScaleUncTab[13]/_nominal_wt;
+    TheoreticalUncmap["wScaleDown"] =  _TheoreticalScaleUncTab[17]/_nominal_wt;
+
     mySysHelper->GetGenInfo(theGenericTag, TheoreticalUncmap, _DataMC_Type);
     mySysHelper->FillGenTaus(MCSignalParticle_Tauidx, MCTauandProd_p4, MCTauandProd_charge, MCTauandProd_Vertex, MCTauandProd_pdgid, MCTau_JAK);
     mySysHelper->GetTauSpinnerWeights(tauSpinnerWTEven, tauSpinnerWTOdd, tauSpinnerWTMM);
@@ -3249,7 +3246,8 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
   mySysHelper->GetJECUnc(_SourceUncValRegrouped_up, _SourceUncValRegrouped_dw, &jecSourceUncRegroupedProviders, &jecUnc);
   /////
   if(Event_isRealData) {
-    mySysHelper->FillTree(Nominal, "Nominal", "Nom", event, trig, _daughters_trgMatched, LeptonP4, PUPPImet, _lheNOutPartons);
+    mySysHelper->ResetVariables();
+    mySysHelper->FillTree(SystematicsMap["Nominal"], "Nominal", "Nom", event, trig, _daughters_trgMatched, LeptonP4, PUPPImet, -1);
   }
   else {
     for(std::map<std::string, TTree*>::iterator iMap = SystematicsMap.begin(); iMap != SystematicsMap.end(); ++iMap) {

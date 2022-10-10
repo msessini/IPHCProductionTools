@@ -114,6 +114,18 @@ SysHelper::SysHelper(Int_t theYear, TString dataMCstring)
   _wBtag = 1.;
   _wBtagUp = 1.;
   _wBtagDown = 1.;
+  _wZpTUp = 1.;
+  _wZpTDown = 1.;
+  _wToppTUp = 1.;
+  _wToppTDown = 1.;
+  _wPSISRUp = 1.;
+  _wPSISRDown = 1.;
+  _wPSFSRUp = 1.;
+  _wPSFSRDown = 1.;
+  _wScaleUp = 1.;
+  _wScaleDown = 1.;
+  _wMC = 1.;
+  _wSignal = 1.;
   //Maps
   _TauIDSFmap.clear();
   _MuonIDTrkSFmap.clear();
@@ -330,6 +342,10 @@ void SysHelper::ResetVariables()
   _wPU = 1.;
   _wZpT = 1.;
   _wToppT = 1.;
+  _wZpTUp = 1.;
+  _wZpTDown = 1.;
+  _wToppTUp = 1.;
+  _wToppTDown = 1.;
   _wBtag = 1.;
   _wBtagUp = 1.;
   _wBtagDown = 1.;
@@ -690,12 +706,14 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
   // Tau and Mu ES are corrected from here
   _tauDM = userdatahelpers::getUserFloat(tau,"MVADM2017v1");
   if(_tauDM<0) return;
-  _tauGenMatch = seltools::GenMatch(SelectedPair.daughter(1), event, generictag);
   _tauPt = tau->pt();
   _tauEta = tau->eta();
   _tauPhi = tau->phi();
   _tauE = tau->energy();
-  _muGenMatch = seltools::GenMatch(SelectedPair.daughter(0), event, generictag);
+  if(!_isData) {
+    _tauGenMatch = seltools::GenMatch(SelectedPair.daughter(1), event, generictag);
+    _muGenMatch = seltools::GenMatch(SelectedPair.daughter(0), event, generictag);
+  }
   _muPt = mu->pt();
   _muEta = mu->eta();
   _muPhi = mu->phi();
