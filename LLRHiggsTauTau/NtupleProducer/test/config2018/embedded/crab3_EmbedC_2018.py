@@ -12,6 +12,7 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'analyzer.py'
 config.JobType.maxMemoryMB = 3500
+config.JobType.inputFiles = (['/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/data','/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/MVADM'])
 
 config.section_("Data")
 config.Data.inputDataset = "/EmbeddingRun2018C/MuTauFinalState-inputDoubleMu_102X_miniAOD-v1/USER"
@@ -19,7 +20,7 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = "EventAwareLumiBased"
 config.Data.unitsPerJob = 50000
 config.Data.totalUnits = -1 #number of event
-config.Data.outLFNDirBase = '/store/user/msessini/EmbedProd_2018_v3'
+config.Data.outLFNDirBase= '/store/user/msessini/Prod_Octobre22'
 config.Data.outputDatasetTag = "EmbedC_2018"
 config.Data.inputDBS = 'phys03'
 config.Data.ignoreLocality = True

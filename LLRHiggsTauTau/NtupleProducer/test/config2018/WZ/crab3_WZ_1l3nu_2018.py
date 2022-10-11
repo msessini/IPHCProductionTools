@@ -12,6 +12,7 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'analyzer.py' # to produce LLR ntuples or EnrichedMiniAOD according to the RunNtuplizer bool
 config.JobType.maxMemoryMB=4500
+config.JobType.inputFiles = (['/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/data','/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/MVADM'])
 
 config.section_("Data")
 config.Data.inputDataset = "/WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1/MINIAODSIM"
@@ -19,7 +20,7 @@ config.Data.inputDBS = 'global'
 config.Data.splitting = "EventAwareLumiBased"
 config.Data.unitsPerJob = 10000
 config.Data.totalUnits = -1 #number of event
-config.Data.outLFNDirBase = '/store/user/msessini/Prod_2018_v3'
+config.Data.outLFNDirBase= '/store/user/msessini/Prod_Octobre22'
 config.Data.outputDatasetTag = "WZ_1l3nu_2018"
 
 config.section_("Site")

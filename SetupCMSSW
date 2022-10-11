@@ -30,12 +30,11 @@ ln -s ../../TauPOG TauPOG
 ln -s ../../TauPolSoftware TauPolSoftware
 ln -s ../../UFHZZAnalysisRun2 UFHZZAnalysisRun2
 
-cd ../../
+cd ../
 
-var=$(pwd)
-sed -i "s%/opt/sbg/cms/safe1/cms/msessini/ProductionTools%$var%g" LLRHiggsTauTau/NtupleProducer/src/SysHelper.cc
-sed -i "s%/opt/sbg/cms/safe1/cms/msessini/ProductiomTools%$var%g" LLRHiggsTauTau/NtupleProducer/plugins/HTauTauNtuplizer.cc
+ln -s ../data data
+ln -s ../MVADM MVADM
 
-cd CMSSW_10_2_23/src
+cd src
 scramv1 b -j 8
 
