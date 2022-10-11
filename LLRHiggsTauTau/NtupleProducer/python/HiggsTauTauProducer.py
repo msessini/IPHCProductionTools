@@ -370,7 +370,7 @@ updatedTauName = "slimmedTausNewID" #name of pat::Tau collection with new tau-Id
 import RecoTauTag.RecoTau.tools.runTauIdMVA as tauIdConfig
 tauIdEmbedder = tauIdConfig.TauIDEmbedder(process, cms, debug = False,
                     updatedTauName = updatedTauName,
-                    toKeep = ["MVADM_2016_v1","MVADM_2017_v1","deepTau2017v2p1","2017v2", 
+                    toKeep = ["MVADM_2017_v1","deepTau2017v2p1","2017v2", 
                                ])
 
 tauIdEmbedder.runTauID()
@@ -1097,7 +1097,7 @@ process.EvntCounterA = cms.EDAnalyzer('EventCounter',
                                       gensrccounter = cms.InputTag('prunedGenParticles'),
                                       GenEventInfo   = cms.InputTag('generator'),
                                       IsEmbed= cms.bool(IsEmbed),
-                                      DataMCType    = cms.untracked.string("DY_ll")
+                                      DataMCType    = cms.untracked.string("H_tautau_VBF")
 )
 
 

@@ -169,47 +169,48 @@ SysHelper::SysHelper(Int_t theYear, TString dataMCstring)
   if(theYear == 2016) _Label = "2016Legacy";
   else _Label = year+"ReReco";
   //
-  TFile *WorkSpace=TFile::Open("root://sbgse1.in2p3.fr//dpm/in2p3.fr/home/cms/phedex/store/user/msessini/data/htt_scalefactors_legacy_2018.root", "READ");
+  TFile *WorkSpace=TFile::Open(("$CMSSW_BASE/data/energy_scale/htt_scalefactors_legacy_"+year+".root").c_str(), "READ");
   _w = std::shared_ptr<RooWorkspace>((RooWorkspace*)gDirectory->Get("w"));
   WorkSpace->Close();
   delete WorkSpace;
   //
-  TFile *TES = new TFile(("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/energy_scale/TauES_dm_DeepTau2017v2p1VSjet_"+_Label+".root").c_str(),"READ");
+  TFile *TES = new TFile(("$CMSSW_BASE/data/energy_scale/TauES_dm_DeepTau2017v2p1VSjet_"+_Label+".root").c_str(),"READ");
   _histTES = dynamic_cast<TH1*>((const_cast<TFile*>(TES))->Get("tes"));
   TES->Close();
   delete TES;
   //
-  TFile *FES= new TFile(("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/energy_scale/TauFES_eta-dm_DeepTau2017v2p1VSe_"+_Label+".root").c_str(),"READ");
+  TFile *FES= new TFile(("$CMSSW_BASE/data/energy_scale/TauFES_eta-dm_DeepTau2017v2p1VSe_"+_Label+".root").c_str(),"READ");
   _histFES = dynamic_cast<TGraph*>((const_cast<TFile*>(FES))->Get("fes"));
   FES->Close();
   delete FES;
   //
-  _recoilPuppiMetCorrector = new RecoilCorrector(("$CMSSW_BASE/src/HTT-utilities/RecoilCorrections/data/Type1_PuppiMET_"+year+".root").c_str());
-  _recoilPuppiMetShifter = new MEtSys(("$CMSSW_BASE/src/HTT-utilities/RecoilCorrections/data/PuppiMETSys_"+year+".root").c_str());
+  _recoilPuppiMetCorrector = new RecoilCorrector(("$CMSSW_BASE/data/recoil/Type1_PuppiMET_"+year+".root").c_str());
+  _recoilPuppiMetShifter = new MEtSys(("$CMSSW_BASE/data/recoil/PuppiMETSys_"+year+".root").c_str());
   //
-  TFile *btagFile = new TFile(("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/b_tag/eta_pt_btagEff_"+year+".root").c_str(),"READ");
+  TFile *btagFile = new TFile(("$CMSSW_BASE/data/b_tag/eta_pt_btagEff_"+year+".root").c_str(),"READ");
   _histbtagEfficiency = dynamic_cast<TH2D*>((const_cast<TFile*>(btagFile))->Get("eta_pt_eff"));
   btagFile->Close();
   delete btagFile;
   //
   if(theYear == 2016) {
-    //_btagCalib = new const BTagCalibration("deepcsv", "/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/b_tag/DeepCSV_2016LegacySF_V1.csv"); //PRODUIRE LES EFF MAP
+    //_btagCalib = new const BTagCalibration("deepcsv", (std::string)getenv("CMSSW_BASE") + "/data/b_tag/DeepCSV_2016LegacySF_V1.csv"); 
+    //PRODUIRE LES EFF MAP
   }
   else if(theYear == 2017) {
-    //_btagCalib = new const BTagCalibration("deepcsv", "/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/b_tag/DeepCSV_94XSF_V5_B_F.csv"); //PRODUIRE LES EFF MAP
+    //_btagCalib = new const BTagCalibration("deepcsv", (std::string)getenv("CMSSW_BASE") + "/data/b_tag/DeepCSV_94XSF_V5_B_F.csv"); 
+    //PRODUIRE LES EFF MAP
   }
   else if(theYear == 2018) {
-    //_btagCalib = new const BTagCalibration("deepcsv", "/opt/sbg/cms/safe1/cms/msessini/ProductionTools/CMSSW_10_2_23/src/LLRHiggsTauTau/NtupleProducer/data/b_tag/DeepCSV_102XSF_V1.csv");
-    _btagCalib = new const BTagCalibration("deepcsv", "src/LLRHiggsTauTau/NtupleProducer/data/b_tag/DeepCSV_102XSF_V1.csv");
+    _btagCalib = new const BTagCalibration("deepcsv", (std::string)getenv("CMSSW_BASE") + "/data/b_tag/DeepCSV_102XSF_V1.csv");
   }
   _btagReader = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up","down"});
   _btagReader->load(*_btagCalib, BTagEntry::FLAV_B, "comb");
   //
-  _IPcorrector = new IpCorrection("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/IP/ip_2018.root");
+  _IPcorrector = new IpCorrection("$CMSSW_BASE/data/IP/ip_2018.root");
   //
   if(theYear == 2016) {
-    TFile* filePUdistribution_data=TFile::Open("src/LLRHiggsTauTau/NtupleProducer/data/pileup/Data_Pileup_2016_271036-284044_80bins.root", "READ");
-    TFile* filePUdistribution_MC=TFile::Open("src/LLRHiggsTauTau/NtupleProducer/data/pileup/MC_Moriond17_PU25ns_V1.root", "READ");
+    TFile* filePUdistribution_data=TFile::Open("$CMSSW_BASE/data/pileup/Data_Pileup_2016_271036-284044_80bins.root", "READ");
+    TFile* filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/MC_Moriond17_PU25ns_V1.root", "READ");
     //
     _PU_data=(TH1D*)filePUdistribution_data->Get("pileup");
     _PU_mc=(TH1D*)filePUdistribution_MC->Get("pileup");
@@ -218,14 +219,14 @@ SysHelper::SysHelper(Int_t theYear, TString dataMCstring)
     filePUdistribution_MC->Close();
   }
   if(theYear == 2017) {
-    TFile* filePUdistribution_data=TFile::Open("src/LLRHiggsTauTau/NtupleProducer/data/pileup/pu_distributions_data_2017.root", "READ");
+    TFile* filePUdistribution_data=TFile::Open("$CMSSW_BASE/data/pileup/pu_distributions_data_2017.root", "READ");
     TFile* filePUdistribution_MC = nullptr;
-    if(_Idstr=="DY_ll") filePUdistribution_MC=TFile::Open("src/LLRHiggsTauTau/NtupleProducer/data/pileup/pileup_2017_DYJetsToLL-LO.root", "READ");
-    else if(_Idstr=="W_3qlnu") filePUdistribution_MC=TFile::Open("src/LLRHiggsTauTau/NtupleProducer/data/pileup/pileup_2017_W3JetsToLNu-LO.root", "READ");
-    else if(_Idstr=="WW_1l1nu2q") filePUdistribution_MC=TFile::Open("src/LLRHiggsTauTau/NtupleProducer/data/pileup/pileup_2017_WWTo1L1Nu2Q.root", "READ");
-    else if(_Idstr=="WminusH_tautau") filePUdistribution_MC=TFile::Open("src/LLRHiggsTauTau/NtupleProducer/data/pileup/pileup_2017_WminusHToTauTau_M-125.root", "READ");
-    else if(_Idstr=="WplusH_tautau") filePUdistribution_MC=TFile::Open("src/LLRHiggsTauTau/NtupleProducer/data/pileup/pileup_2017_WplusHToTauTau_M-125.root", "READ");
-    else filePUdistribution_MC=TFile::Open("src/LLRHiggsTauTau/NtupleProducer/data/pileup/pileup_2017_DYJetsToLL-ext.root", "READ");
+    if(_Idstr=="DY_ll") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_DYJetsToLL-LO.root", "READ");
+    else if(_Idstr=="W_3qlnu") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_W3JetsToLNu-LO.root", "READ");
+    else if(_Idstr=="WW_1l1nu2q") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WWTo1L1Nu2Q.root", "READ");
+    else if(_Idstr=="WminusH_tautau") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WminusHToTauTau_M-125.root", "READ");
+    else if(_Idstr=="WplusH_tautau") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WplusHToTauTau_M-125.root", "READ");
+    else filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_DYJetsToLL-ext.root", "READ");
     //
     _PU_data=(TH1D*)filePUdistribution_data->Get("pileup");
     _PU_mc=(TH1D*)filePUdistribution_MC->Get("pileup");
@@ -234,8 +235,8 @@ SysHelper::SysHelper(Int_t theYear, TString dataMCstring)
     filePUdistribution_MC->Close();
   }
   if(theYear == 2018) {
-    TFile* filePUdistribution_data=TFile::Open("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/pileup/pileUp_data_Autumn18.root", "READ");
-    TFile* filePUdistribution_MC=TFile::Open("$CMSSW_BASE/src/LLRHiggsTauTau/NtupleProducer/data/pileup/pileUp_MC_Autumn18.root", "READ");
+    TFile* filePUdistribution_data=TFile::Open("$CMSSW_BASE/data/pileup/pileUp_data_Autumn18.root", "READ");
+    TFile* filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileUp_MC_Autumn18.root", "READ");
     //
     _PU_data=(TH1D *)filePUdistribution_data->Get("pileup");
     _PU_mc=(TH1D *)filePUdistribution_MC->Get("pileup");

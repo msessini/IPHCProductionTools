@@ -35,16 +35,16 @@ class PATTauDiscriminationMVADM final : public PATTauMVADMDiscriminationProducer
           TString input_name_dm_0_1_applytoodd;
 
           if(version_ == "MVADM_2016_v1") {
-            input_name_dm_10_applytoeven = (std::string)getenv("CMSSW_BASE") + "/src/RecoTauTag/RecoTau/TrainingFiles/data/MVADM/mvadm_applytoeven_2016v1_dm10.xml";
-            input_name_dm_10_applytoodd = (std::string)getenv("CMSSW_BASE") + "/src/RecoTauTag/RecoTau/TrainingFiles/data/MVADM/mvadm_applytoodd_2016v1_dm10.xml";
-            input_name_dm_0_1_applytoeven = (std::string)getenv("CMSSW_BASE") + "/src/RecoTauTag/RecoTau/TrainingFiles/data/MVADM/mvadm_applytoeven_2016v1_dm0_dm1.xml";
-            input_name_dm_0_1_applytoodd = (std::string)getenv("CMSSW_BASE") + "/src/RecoTauTag/RecoTau/TrainingFiles/data/MVADM/mvadm_applytoodd_2016v1_dm0_dm1.xml";
+            input_name_dm_10_applytoeven = (std::string)getenv("CMSSW_BASE") + "/MVADM/mvadm_applytoeven_2016v1_dm10.xml";
+            input_name_dm_10_applytoodd = (std::string)getenv("CMSSW_BASE") + "/MVADM/mvadm_applytoodd_2016v1_dm10.xml";
+            input_name_dm_0_1_applytoeven = (std::string)getenv("CMSSW_BASE") + "/MVADM/mvadm_applytoeven_2016v1_dm0_dm1.xml";
+            input_name_dm_0_1_applytoodd = (std::string)getenv("CMSSW_BASE") + "/MVADM/mvadm_applytoodd_2016v1_dm0_dm1.xml";
           }
           if(version_ == "MVADM_2017_v1") {
-            input_name_dm_10_applytoeven = (std::string)getenv("CMSSW_BASE") + "/src/RecoTauTag/RecoTau/TrainingFiles/data/MVADM/mvadm_applytoeven_2017v1_dm10.xml";
-            input_name_dm_10_applytoodd = (std::string)getenv("CMSSW_BASE") + "/src/RecoTauTag/RecoTau/TrainingFiles/data/MVADM/mvadm_applytoodd_2017v1_dm10.xml";
-            input_name_dm_0_1_applytoeven = (std::string)getenv("CMSSW_BASE") + "/src/RecoTauTag/RecoTau/TrainingFiles/data/MVADM/mvadm_applytoeven_2017v1_dm0_dm1.xml";
-            input_name_dm_0_1_applytoodd = (std::string)getenv("CMSSW_BASE") + "/src/RecoTauTag/RecoTau/TrainingFiles/data/MVADM/mvadm_applytoodd_2017v1_dm0_dm1.xml";
+            input_name_dm_10_applytoeven = (std::string)getenv("CMSSW_BASE") + "/MVADM/mvadm_applytoeven_2017v1_dm10.xml";
+            input_name_dm_10_applytoodd = (std::string)getenv("CMSSW_BASE") + "/MVADM/mvadm_applytoodd_2017v1_dm10.xml";
+            input_name_dm_0_1_applytoeven = (std::string)getenv("CMSSW_BASE") + "/MVADM/mvadm_applytoeven_2017v1_dm0_dm1.xml";
+            input_name_dm_0_1_applytoodd = (std::string)getenv("CMSSW_BASE") + "/MVADM/mvadm_applytoodd_2017v1_dm0_dm1.xml";
           }
           else {
             cms::Exception("MVA DM version not found") << "Requested version of ID does not exist."; 
