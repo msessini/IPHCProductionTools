@@ -8,7 +8,7 @@ PyFilePath = os.environ['CMSSW_BASE']+"/src/LLRHiggsTauTau/NtupleProducer/"
 
 # Year/Period
 YEAR   = 2018
-PERIOD = 'D'
+PERIOD = ' '
 
 #samples list (it could be moved to a cfg file for better reading
 #samples = [
@@ -37,8 +37,8 @@ COMPUTEUPDOWNSVFIT=False # compute SVfit for up/down TES variation
 COMPUTEMETUPDOWNSVFIT=False # compute SVfit for up/down MET JES variation
 doCPVariables=False # compute CP variables and PV refit
 COMPUTEQGVAR = False # compute QG Tagger for jets
-IsMC=False
-IsEmbed=True
+IsMC=True
+IsEmbed=False
 Is25ns=True
 HLTProcessName='HLT' #Different names possible, check e.g. at https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD.
 if not IsMC:
@@ -93,9 +93,9 @@ process.source = cms.Source("PoolSource",
     #'/store/mc/RunIIAutumn18MiniAOD/VBFHHTo2B2Tau_CV_1_C2V_1_C3_1_TuneCP5_PSWeights_13TeV-madgraph-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/250000/F22484D3-E820-F040-8E63-0864695D025B.root'
 
     #'/store/mc/RunIIAutumn18MiniAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/00000/062A981D-4A57-664A-A583-E803A658594B.root'
-    '/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/120000/B3F93EA2-04C6-E04E-96AF-CB8FAF67E6BA.root'
+    #'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/120000/B3F93EA2-04C6-E04E-96AF-CB8FAF67E6BA.root'
     #'/store/mc/RunIIAutumn18MiniAOD/VBFHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/240000/F55690CF-BE27-D845-ADD0-4C794EDB202D.root'
-    #'/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/20000/9A8D0B74-11F2-A147-AE75-056DE50F66A2.root'
+    '/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/20000/9A8D0B74-11F2-A147-AE75-056DE50F66A2.root'
     #'/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/60000/11345215-5D59-3A48-8895-86A56D94D62F.root' #ths file for singular matrix 1:86577324
     #'/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/240000/2C11B23D-6BBC-634B-BBCB-99A49DCA2590.root'
     #'file:crashGEF.root'
