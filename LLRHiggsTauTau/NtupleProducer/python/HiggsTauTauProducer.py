@@ -604,7 +604,7 @@ process.genInfo = cms.EDProducer("GenFiller",
 if IsEmbed:process.genInfo.src = cms.InputTag("prunedGenParticles","","MERGE")
 else:process.genInfo.src = cms.InputTag("prunedGenParticles")
                   
-if IsMC : process.geninfo = cms.Sequence(process.genInfo)
+if(IsMC or IsEmbed) : process.geninfo = cms.Sequence(process.genInfo)
 else : process.geninfo = cms.Sequence()
 
 

@@ -42,7 +42,7 @@ class SysHelper{
   void GetCollections(const edm::View<pat::CompositeCandidate>* cands_, const edm::View<reco::Candidate>* daus_, const edm::View<pat::Jet> *jets_, const edm::View<pat::Jet> *jetsUp_, const edm::View<pat::Jet> *jetsDown_);
   void GetGenInfo(edm::EDGetTokenT<edm::View<pat::GenericParticle>> generictag_, std::map<std::string, double> theomap, Int_t dataMCtype);
   void FillGenTaus(std::vector<std::vector<unsigned int>> signal_Tauidx, std::vector<std::vector<std::vector<double>>> tauandprod_p4, std::vector<std::vector<int>> tauandprod_charge, std::vector<std::vector<std::vector<double>>> tauandprod_vtx, std::vector<std::vector<int>> taudandprod_pdgid, std::vector<unsigned int> tau_JAK);
-  void GetEventInfo(bool isEmbed, bool isData, bool isMC, ULong64_t runNumber, Float_t nPU, ULong64_t evtidx, Int_t lumi);
+  void GetEventInfo(bool isEmbed, bool isMC, ULong64_t runNumber, Float_t nPU, ULong64_t evtidx, Int_t lumi);
   void GetDecayProducts(std::vector<LorentzVectorParticle> a1lvp, std::vector<TrackParticle> muontrack, std::vector<std::vector<std::vector<double>>> pi_P4, std::vector<std::vector<double>> pi_charges);
   void GetPV(std::vector<float> _RefitPVBS_x, std::vector<float> _RefitPVBS_y, std::vector<float> _RefitPVBS_z, std::vector<std::vector<std::vector<double>>> _RefitPVBS_Cov, std::vector<size_t> _VertexHashBS1, std::vector<size_t> _VertexHashBS2, std::vector<size_t> _LeptonHash);
   bool FillPV(int tauIndex, int muIndex);

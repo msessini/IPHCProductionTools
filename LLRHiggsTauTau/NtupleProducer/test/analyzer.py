@@ -95,16 +95,14 @@ process.source = cms.Source("PoolSource",
     #'/store/mc/RunIIAutumn18MiniAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/00000/062A981D-4A57-664A-A583-E803A658594B.root'
     #'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/120000/B3F93EA2-04C6-E04E-96AF-CB8FAF67E6BA.root'
     #'/store/mc/RunIIAutumn18MiniAOD/VBFHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/240000/F55690CF-BE27-D845-ADD0-4C794EDB202D.root'
-    '/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/20000/9A8D0B74-11F2-A147-AE75-056DE50F66A2.root'
+    #'/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/20000/9A8D0B74-11F2-A147-AE75-056DE50F66A2.root'
     #'/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/60000/11345215-5D59-3A48-8895-86A56D94D62F.root' #ths file for singular matrix 1:86577324
     #'/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/240000/2C11B23D-6BBC-634B-BBCB-99A49DCA2590.root'
-    #'file:crashGEF.root'
-    #'file:pickevents.root'
     ),
 )
 
 # process.source.skipEvents = cms.untracked.uint32(968)
-# process.source.eventsToProcess = cms.untracked.VEventRange("1:86577000-1:86577324") # run only on event=2347130 (syntax= from run:evt - to run:evt)
+# process.source.eventsToProcess = cms.untracked.VEventRange("1:346516-1:346516") # run only on event=2347130 (syntax= from run:evt - to run:evt)
 
 #Limited nEv for testing purposes. -1 to run all events
 process.maxEvents.input = 1000

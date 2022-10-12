@@ -384,8 +384,10 @@ void SysHelper::GetGenInfo(edm::EDGetTokenT<edm::View<pat::GenericParticle>> gen
 }
 
 void SysHelper::FillGenTaus(std::vector<std::vector<unsigned int>> signal_Tauidx, std::vector<std::vector<std::vector<double>>> tauandprod_p4, std::vector<std::vector<int>> tauandprod_charge, std::vector<std::vector<std::vector<double>>> tauandprod_vtx, std::vector<std::vector<int>> taudandprod_pdgid, std::vector<unsigned int> tau_JAK) {
-  for(unsigned int i = 0; i<signal_Tauidx.size(); i++) {
-    if(signal_Tauidx.at(i).size()!=0) {
+
+  if(signal_Tauidx.size()!=0) {
+    for(unsigned int i = 0; i<signal_Tauidx.size(); i++) {
+      if(signal_Tauidx.at(i).size()!=2) continue;
       int tauIdx, muIdx;
       if(tau_JAK.at(0) == 2) {
 	tauIdx = 1;
@@ -418,39 +420,41 @@ void SysHelper::FillGenTaus(std::vector<std::vector<unsigned int>> signal_Tauidx
 		        tauandprod_vtx.at(signal_Tauidx.at(i).at(muIdx)).at(2).at(2) - _genPVz);
       //Fill gen CP
       if(tau_JAK.at(tauIdx) == 5) {
-        math::XYZTLorentzVector genMuonP4(_genMuonpx, _genMuonpy, _genMuonpz, _genMuonE);
-        TLorentzVector genHadTauP4(_genTaupx, _genTaupy, _genTaupz, _genTauE);
-        std::vector<std::vector<double>> genPionsP4;
-        std::vector<double> genPionsCharge;
-        for(unsigned int j = 0; j<tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).size(); j++) {
-          if(abs(taudandprod_pdgid.at(signal_Tauidx.at(i).at(tauIdx)).at(j)) == 211 || taudandprod_pdgid.at(signal_Tauidx.at(i).at(tauIdx)).at(j) == 111) {
+	math::XYZTLorentzVector genMuonP4(_genMuonpx, _genMuonpy, _genMuonpz, _genMuonE);
+	TLorentzVector genHadTauP4(_genTaupx, _genTaupy, _genTaupz, _genTauE);
+	std::vector<std::vector<double>> genPionsP4;
+	std::vector<double> genPionsCharge;
+	for(unsigned int j = 0; j<tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).size(); j++) {
+	  if(abs(taudandprod_pdgid.at(signal_Tauidx.at(i).at(tauIdx)).at(j)) == 211 || taudandprod_pdgid.at(signal_Tauidx.at(i).at(tauIdx)).at(j) == 111) {
 	    std::vector<double> genPionP4;
 	    genPionP4.push_back(tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(j).at(0));
-            genPionP4.push_back(tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(j).at(1));
-            genPionP4.push_back(tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(j).at(2));
-            genPionP4.push_back(tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(j).at(3));
+	    genPionP4.push_back(tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(j).at(1));
+	    genPionP4.push_back(tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(j).at(2));
+	    genPionP4.push_back(tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(j).at(3));
 	    genPionsP4.push_back(genPionP4);
 	    genPionsCharge.push_back(tauandprod_charge.at(signal_Tauidx.at(i).at(tauIdx)).at(j));
-          }
-        }
-        CPTools genCP(genPionsP4, genPionsCharge, genMuonP4, genMuRef);
-        genCP.setImpactParameter();
-        TVector3 genMuIP = genCP.getImpactParameter();
-        _genMuonIPx = genMuIP.X();
-        _genMuonIPy = genMuIP.Y();
-        _genMuonIPz = genMuIP.Z();
-        _gendpPhiCP = genCP.getPhiCPwithDP();
-        _genpvPhiCP = genCP.getPhiCPwithPV(genHadTauP4);
+	  }
+	}
+	CPTools genCP(genPionsP4, genPionsCharge, genMuonP4, genMuRef);
+	genCP.setImpactParameter();
+	TVector3 genMuIP = genCP.getImpactParameter();
+	_genMuonIPx = genMuIP.X();
+	_genMuonIPy = genMuIP.Y();
+	_genMuonIPz = genMuIP.Z();
+	_gendpPhiCP = genCP.getPhiCPwithDP();
+	_genpvPhiCP = genCP.getPhiCPwithPV(genHadTauP4);
       }
+      else return;
     }
   }
+  else return;
 }
 
-void SysHelper::GetEventInfo(bool isEmbed, bool isData, bool isMC, ULong64_t runNumber, Float_t nPU, ULong64_t evtidx, Int_t lumi) {
+void SysHelper::GetEventInfo(bool isEmbed, bool isMC, ULong64_t runNumber, Float_t nPU, ULong64_t evtidx, Int_t lumi) {
 
   _isEmbed = isEmbed;
-  _isData = isData;
   _isMC = isMC;
+  _isData = !(isEmbed || isMC);
   _runNumber = runNumber;
   _nPU = nPU;
   _evt = evtidx;
@@ -724,7 +728,6 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
   _Npartons = Npartons;
   //
   std::pair<std::vector<math::XYZTLorentzVector>, TVector2> JetsandMET = CorrectedJetsandMET(sysType, var, PUPPImet, mu, tau, JECmap);
-
   // Jets are corrected from here
   std::vector<math::XYZTLorentzVector> SelectedJets = JetsandMET.first;
   _Njets = SelectedJets.size();
@@ -795,7 +798,6 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
    
   // Compute PhiCP here for a1mu channel
   if(_tauDM == 10 && RefitPionsP4.size()==3 && A1LVP.at(_tauIndex).LV().P()!=0 && pvcov.size()!=0) {
-
     _pvCov00 = pvcov[0][0];
     _pvCov11 = pvcov[1][1];
     _pvCov22 = pvcov[2][2];
@@ -1075,8 +1077,8 @@ std::vector<math::XYZTLorentzVector> SysHelper::SelectJets(const reco::Candidate
     std::map<std::string, double> BTaggingSFmap = weight::BTaggingSF(SelectedPATJets, _theYear, sysType, _histbtagEfficiency, _btagCalib, _btagReader);
     _wBtag = BTaggingSFmap["wBtag"];
     if(sysType == "Nominal") {
-    _wBtagUp = BTaggingSFmap["wBtagUp"];
-    _wBtagDown = BTaggingSFmap["wBtagDown"];
+      _wBtagUp = BTaggingSFmap["wBtagUp"];
+      _wBtagDown = BTaggingSFmap["wBtagDown"];
     }
   }
   //
