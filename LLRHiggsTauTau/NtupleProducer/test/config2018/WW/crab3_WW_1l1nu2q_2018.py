@@ -4,7 +4,7 @@ from WMCore.Configuration import Configuration
 config = Configuration()
 
 config.section_("General")
-config.General.requestName = "crab3_WW_1l1nu2q_2018"
+config.General.requestName = "WW_1l1nu2q_2018"
 config.General.workArea = "crab3_production2018"
 config.General.transferLogs = True
 
