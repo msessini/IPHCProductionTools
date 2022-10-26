@@ -532,7 +532,7 @@ std::map<std::string, double> weight::BTaggingSF(std::vector<const pat::Jet*> se
   for(std::vector<const pat::Jet*>::iterator iJet = selectedJets.begin(); iJet != selectedJets.end(); ++iJet) {
     //
     double SF = reader->eval_auto_bounds("central", BTagEntry::FLAV_B, std::abs((*iJet)->eta()), (*iJet)->pt());
-    double epsilon = btagEfficiency->GetBinContent((*iJet)->pt(), (*iJet)->eta());
+    double epsilon = btagEfficiency->GetBinContent(btagEfficiency->FindBin((*iJet)->pt(), (*iJet)->eta()));
     if(((*iJet)->bDiscriminator("pfDeepCSVJetTags:probb") + (*iJet)->bDiscriminator("pfDeepCSVJetTags:probbb"))>CSVcut && (*iJet)->pt()>20 && abs((*iJet)->eta())<2.4) {
       P_mc *= epsilon;
       P_data *= SF*epsilon;
