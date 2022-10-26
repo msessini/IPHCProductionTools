@@ -35,7 +35,7 @@ typedef std::map<std::string, std::unique_ptr<JetCorrectionUncertainty>> myJECMa
 
 class SysHelper{
  public:
-  SysHelper(Int_t theYear, TString dataMCstring);
+  SysHelper(Int_t theYear, std::string dataMCstring);
   ~SysHelper();
   void ResetVariables();
   void MakeBranches(TTree *tree, bool isNominal);
@@ -201,7 +201,7 @@ class SysHelper{
   float _pvCov12;
   std::vector<std::vector<double>> pvcov;
   //Event
-  TString _Idstr;
+  std::string _Idstr;
   Int_t _Id;
   int _Npartons;
   bool _isEmbed;

@@ -1,6 +1,6 @@
 #include <LLRHiggsTauTau/NtupleProducer/interface/SysHelper.h>
 
-SysHelper::SysHelper(Int_t theYear, TString dataMCstring)
+SysHelper::SysHelper(Int_t theYear, std::string dataMCstring)
 {
   _theYear = theYear;
   _Idstr = dataMCstring;
@@ -221,11 +221,11 @@ SysHelper::SysHelper(Int_t theYear, TString dataMCstring)
   if(theYear == 2017) {
     TFile* filePUdistribution_data=TFile::Open("$CMSSW_BASE/data/pileup/pu_distributions_data_2017.root", "READ");
     TFile* filePUdistribution_MC = nullptr;
-    if(_Idstr=="DY_ll") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_DYJetsToLL-LO.root", "READ");
-    else if(_Idstr=="W_3qlnu") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_W3JetsToLNu-LO.root", "READ");
-    else if(_Idstr=="WW_1l1nu2q") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WWTo1L1Nu2Q.root", "READ");
-    else if(_Idstr=="WminusH_tautau") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WminusHToTauTau_M-125.root", "READ");
-    else if(_Idstr=="WplusH_tautau") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WplusHToTauTau_M-125.root", "READ");
+    if(_Idstr=="dy_ll") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_DYJetsToLL-LO.root", "READ");
+    else if(_Idstr=="w_3qlnu") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_W3JetsToLNu-LO.root", "READ");
+    else if(_Idstr=="ww_1l1nu2q") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WWTo1L1Nu2Q.root", "READ");
+    else if(_Idstr=="wminush_tautau") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WminusHToTauTau_M-125.root", "READ");
+    else if(_Idstr=="wplush_tautau") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WplusHToTauTau_M-125.root", "READ");
     else filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_DYJetsToLL-ext.root", "READ");
     //
     _PU_data=(TH1D*)filePUdistribution_data->Get("pileup");
@@ -1220,12 +1220,12 @@ bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Even
 
 void SysHelper::GetSampleType() {
 
-  if(_Idstr=="DY_ll" || _Idstr=="DY_1qll" || _Idstr=="DY_2qll" || _Idstr=="DY_3qll" || _Idstr=="DY_4qll" || _Idstr=="DY_ll_10to50") _isZ = true;
-  if(_Idstr=="W_lnu" || _Idstr=="W_1qlnu" || _Idstr=="W_2qlnu" || _Idstr=="W_3qlnu" || _Idstr=="W_4qlnu") _isW = true;
-  if(_Idstr=="H_tautau_ggF" || _Idstr=="H_tautau_VBF" || _Idstr=="ZH_tautau" || _Idstr=="WplusH_tautau" || _Idstr=="WminusH_tautau") _isSignal = true;
-  if(_Idstr=="QCD") _isQCD = true;
-  if(_Idstr=="WZ_2l2q" || _Idstr=="WZ_3l1nu" || _Idstr=="WZ_1l3nu" || _Idstr=="WZ_1l1nu2q" || _Idstr=="ZZ_4l" || _Idstr=="ZZ_2l2nu" || _Idstr=="ZZ_2l2q" || _Idstr=="WW_2l2nu" || _Idstr=="WW_1l1nu2q") _isVV = true;
+  if(_Idstr=="dy_ll" || _Idstr=="dy_1qll" || _Idstr=="dy_2qll" || _Idstr=="dy_3qll" || _Idstr=="dy_4qll" || _Idstr=="dy_ll_10to50") _isZ = true;
+  if(_Idstr=="w_lnu" || _Idstr=="w_1qlnu" || _Idstr=="w_2qlnu" || _Idstr=="w_3qlnu" || _Idstr=="w_4qlnu") _isW = true;
+  if(_Idstr=="h_tautau_ggf" || _Idstr=="h_tautau_vbf" || _Idstr=="zh_tautau" || _Idstr=="wplush_tautau" || _Idstr=="wminush_tautau") _isSignal = true;
+  if(_Idstr=="qcd") _isQCD = true;
+  if(_Idstr=="wz_2l2q" || _Idstr=="wz_3l1nu" || _Idstr=="wz_1l3nu" || _Idstr=="wz_1l1nu2q" || _Idstr=="zz_4l" || _Idstr=="zz_2l2nu" || _Idstr=="zz_2l2q" || _Idstr=="ww_2l2nu" || _Idstr=="ww_1l1nu2q") _isVV = true;
   if(_Idstr=="ttbar_dilep" || _Idstr=="ttbar_hadr" || _Idstr=="ttbar_semilep") _isTTbar = true;
-  if(_Idstr=="tw" || _Idstr=="tbarw" || _Idstr=="ST_tchannel_top" || _Idstr=="ST_tchannel_antitop") _isSingleTop = true;
+  if(_Idstr=="tw" || _Idstr=="tbarw" || _Idstr=="st_tchannel_top" || _Idstr=="st_tchannel_antitop") _isSingleTop = true;
 }
 

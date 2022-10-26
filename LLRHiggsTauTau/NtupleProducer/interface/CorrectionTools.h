@@ -36,7 +36,7 @@ namespace weight{
   std::map<std::string, double> TriggerSF(int genmatch, float DM, math::XYZTLorentzVector taup4, double m_iso, math::XYZTLorentzVector mup4, Int_t theYear, bool isEmbed, std::string sysType, std::shared_ptr<RooWorkspace> w);
   std::map<std::string, double> BTaggingSF(std::vector<const pat::Jet*> selectedJets, Int_t theYear, std::string sysType, TH2D* btagEfficiency, const BTagCalibration *calib, BTagCalibrationReader *reader);
   //
-  double SignalReweighting(Int_t theYear, TString id);
+  double SignalReweighting(Int_t theYear, std::string id);
   double PileUpreweighting(float nPU, TH1D* PU_data, TH1D* PU_mc);
   double Stitching(Int_t theYear, int id, int taugenmatch, int mugenmatch, double mvis, bool isZ, bool isW, int Npartons);
 };

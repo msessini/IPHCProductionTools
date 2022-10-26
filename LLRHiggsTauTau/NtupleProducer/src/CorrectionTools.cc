@@ -566,30 +566,30 @@ std::map<std::string, double> weight::BTaggingSF(std::vector<const pat::Jet*> se
 
 //////
 
-double weight::SignalReweighting(Int_t theYear, TString id) {
+double weight::SignalReweighting(Int_t theYear, std::string id) {
 
   double wSignal = 1.;
   //
   if(theYear == 2016) {
-    if(id == "H_tautau_ggF") wSignal = 0.2455;
-    else if(id == "H_tautau_VBF") wSignal = 0.2727;
-    else if(id == "ZH_tautau") wSignal = 0.2546;
-    else if(id == "WminusH_tautau") wSignal = 0.2596;
-    else if(id == "WplusH_tautau") wSignal = 0.2425;
+    if(id == "h_tautau_ggf") wSignal = 0.2455;
+    else if(id == "h_tautau_vbf") wSignal = 0.2727;
+    else if(id == "zh_tautau") wSignal = 0.2546;
+    else if(id == "wminush_tautau") wSignal = 0.2596;
+    else if(id == "wplush_tautau") wSignal = 0.2425;
   }
   if(theYear == 2016) {
-    if(id == "H_tautau_ggF") wSignal = 0.2447;
-    else if(id == "H_tautau_VBF") wSignal = 0.2697;
-    else if(id == "ZH_tautau") wSignal = 0.2514;
-    else if(id == "WminusH_tautau") wSignal = 0.2567;
-    else if(id == "WplusH_tautau") wSignal = 0.2394;
+    if(id == "h_tautau_ggf") wSignal = 0.2447;
+    else if(id == "h_tautau_vbf") wSignal = 0.2697;
+    else if(id == "zh_tautau") wSignal = 0.2514;
+    else if(id == "wminush_tautau") wSignal = 0.2567;
+    else if(id == "wplush_tautau") wSignal = 0.2394;
   }
   if(theYear == 2016) {
-    if(id == "H_tautau_ggF") wSignal = 0.2446;
-    else if(id == "H_tautau_VBF") wSignal = 0.2695;
-    else if(id == "ZH_tautau") wSignal = 0.2513;
-    else if(id == "WminusH_tautau") wSignal = 0.2563;
-    else if(id == "WplusH_tautau") wSignal = 0.2397;
+    if(id == "h_tautau_ggf") wSignal = 0.2446;
+    else if(id == "h_tautau_vbf") wSignal = 0.2695;
+    else if(id == "zh_tautau") wSignal = 0.2513;
+    else if(id == "wminush_tautau") wSignal = 0.2563;
+    else if(id == "wplush_tautau") wSignal = 0.2397;
   }
   return wSignal;
 }
