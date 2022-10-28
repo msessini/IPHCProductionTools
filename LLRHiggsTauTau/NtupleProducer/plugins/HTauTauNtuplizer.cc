@@ -1623,7 +1623,7 @@ HTauTauNtuplizer::HTauTauNtuplizer(const edm::ParameterSet& pset) : //reweight()
 
   DataMCType DMTstr;
   dataMCstring = DMTstr.GetName();
-  mySysHelper = new SysHelper(theYear,dataMCstring);
+  mySysHelper = new SysHelper(theYear,dataMCstring.Data());
   myTriggerHelper = new triggerhelper();// (HLTList);
 
   if (HLTList.size() > 64) cout << endl << "** HTauTauNtuplizer : Warning : trigger list size exceeds 64, not enough bits in Long64_t type to store all" << endl;
