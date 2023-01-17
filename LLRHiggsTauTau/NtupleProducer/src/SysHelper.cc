@@ -193,12 +193,10 @@ SysHelper::SysHelper(Int_t theYear, std::string dataMCstring)
   delete btagFile;
   //
   if(theYear == 2016) {
-    //_btagCalib = new const BTagCalibration("deepcsv", (std::string)getenv("CMSSW_BASE") + "/data/b_tag/DeepCSV_2016LegacySF_V1.csv"); 
-    //PRODUIRE LES EFF MAP
+    _btagCalib = new const BTagCalibration("deepcsv", (std::string)getenv("CMSSW_BASE") + "/data/b_tag/DeepCSV_2016LegacySF_V1.csv"); 
   }
   else if(theYear == 2017) {
-    //_btagCalib = new const BTagCalibration("deepcsv", (std::string)getenv("CMSSW_BASE") + "/data/b_tag/DeepCSV_94XSF_V5_B_F.csv"); 
-    //PRODUIRE LES EFF MAP
+    _btagCalib = new const BTagCalibration("deepcsv", (std::string)getenv("CMSSW_BASE") + "/data/b_tag/DeepCSV_94XSF_V5_B_F.csv"); 
   }
   else if(theYear == 2018) {
     _btagCalib = new const BTagCalibration("deepcsv", (std::string)getenv("CMSSW_BASE") + "/data/b_tag/DeepCSV_102XSF_V1.csv");
@@ -206,7 +204,10 @@ SysHelper::SysHelper(Int_t theYear, std::string dataMCstring)
   _btagReader = new BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up","down"});
   _btagReader->load(*_btagCalib, BTagEntry::FLAV_B, "comb");
   //
-  _IPcorrector = new IpCorrection("$CMSSW_BASE/data/IP/ip_2018.root");
+  if(_Idstr=="dy_mutau_embedded") {
+    _IPcorrector = new IpCorrection(("$CMSSW_BASE/data/IP/ip_embed_"+year+"_pvbs.root").c_str());
+  }
+  else _IPcorrector = new IpCorrection(("$CMSSW_BASE/data/IP/ip_"+year+"_pvbs.root").c_str());
   //
   if(theYear == 2016) {
     TFile* filePUdistribution_data=TFile::Open("$CMSSW_BASE/data/pileup/Data_Pileup_2016_271036-284044_80bins.root", "READ");
@@ -764,7 +765,7 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
     ShiftedPUPPImet_px = thePUPPImet.Px();
     ShiftedPUPPImet_py = thePUPPImet.Py();
   }
-  if((_isSignal || _isW || _isZ) && !_isEmbed){
+  if((_isMC && (_isSignal || _isW || _isZ)) && !_isEmbed){
     corrector::METRecoilCorrection(event, generictag, PUPPImet, _Njets, ShiftedPUPPImet_px, ShiftedPUPPImet_py, sysType, var, _recoilPuppiMetCorrector, _recoilPuppiMetShifter);
   }
   // MET is corrected from here
@@ -814,7 +815,7 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
     _GEFtauPhi = CP.getTau("Phi");
     _GEFtauEta = CP.getTau("Eta");
     CP.setImpactParameter();
-    if(_isMC) {
+    if(!_isData) {
       IpCorrection ipcorrector = (*_IPcorrector);
       CP.correctIP(event, generictag, mu->eta(), ipcorrector);
     }

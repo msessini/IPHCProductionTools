@@ -250,6 +250,7 @@ private:
   //Output Objects
   //TTree *myTree;//->See from ntuplefactory in zz4l
   TH1F *hCounter;
+  TH1F *hMCweightCounter;
   TH1F *hTauIDs;
   TH1F *hYear;
   triggerhelper* myTriggerHelper;
@@ -2610,6 +2611,7 @@ void HTauTauNtuplizer::beginJob(){
 
   int nbins=3+(myTriggerHelper->GetNTriggers());
   hCounter = fs->make<TH1F>("Counters","Counters",nbins,0,nbins);
+  hMCweightCounter = fs->make<TH1F>("MCweightCounter","MCweightCounter",1,0,1);
   hTauIDs = fs->make<TH1F>("TauIDs","TauIDs",ntauIds,0,ntauIds);
   hYear = fs->make<TH1F>("Year","Year",50,2000,2050);
 }
@@ -2858,6 +2860,12 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
   edm::Handle< double > theprefweight;
   edm::Handle< double > theprefweightup;
   edm::Handle< double > theprefweightdown;
+
+  if(theisMC || IsEmbed){
+    edm::Handle<GenEventInfoProduct> hgenEvt;
+    event.getByToken(theGenTag,hgenEvt);
+    hMCweightCounter->SetBinContent(1,hgenEvt->weight());
+  }
 
   // protect in case of events where trigger hasn't fired --> no collection created
   event.getByToken(theCandTag,candHandle);
@@ -3219,7 +3227,6 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
   double tauSpinnerWTMM;
   //Theoretical Uncertainties
   std::map<std::string, double> TheoreticalUncmap;
-
   if(theisMC || IsEmbed) {
     event.getByToken(theTauSpinnerWTEventag,tauSpinnerWTEvenHandle);
     tauSpinnerWTEven = (*tauSpinnerWTEvenHandle.product());
