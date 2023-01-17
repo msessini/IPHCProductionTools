@@ -1097,7 +1097,7 @@ process.EvntCounterA = cms.EDAnalyzer('EventCounter',
                                       gensrccounter = cms.InputTag('prunedGenParticles'),
                                       GenEventInfo   = cms.InputTag('generator'),
                                       IsEmbed= cms.bool(IsEmbed),
-                                      DataMCType    = cms.untracked.string("H_tautau_VBF")
+                                      DataMCType    = cms.untracked.string("DY_mutau_embedded")
 )
 
 
