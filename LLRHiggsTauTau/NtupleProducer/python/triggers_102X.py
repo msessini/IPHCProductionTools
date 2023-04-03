@@ -83,8 +83,8 @@ HLTLIST = cms.VPSet(
     #bit 7
     cms.PSet (
         HLT = cms.string("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v"),
-        path1 = cms.vstring ("hltL3crIsoBigORMu18erTauXXer2p1L1f0L2f10QL3f20QL3trkIsoFiltered0p07",""),
-        path2 = cms.vstring ("hltL1sBigORMu18erTauXXer2p1",""),
+        path1 = cms.vstring ("hltL3crIsoBigORMu18erTauXXer2p1L1f0L2f10QL3f20QL3trkIsoFiltered0p07","hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
+        path2 = cms.vstring ("hltHpsSelectedPFTau27LooseChargedIsolationAgainstMuonL1HLTMatched","hltHpsOverlapFilterIsoMu20LooseChargedIsoPFTau27L1Seeded"),
         path3 = cms.vstring (""),
         path4 = cms.vstring (""),
         leg1 = cms.int32(13),

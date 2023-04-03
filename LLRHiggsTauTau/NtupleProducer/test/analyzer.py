@@ -37,8 +37,8 @@ COMPUTEUPDOWNSVFIT=False # compute SVfit for up/down TES variation
 COMPUTEMETUPDOWNSVFIT=False # compute SVfit for up/down MET JES variation
 doCPVariables=False # compute CP variables and PV refit
 COMPUTEQGVAR = False # compute QG Tagger for jets
-IsMC=True
-IsEmbed=False
+IsMC=False
+IsEmbed=True
 Is25ns=True
 HLTProcessName='HLT' #Different names possible, check e.g. at https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD.
 if not IsMC:
@@ -94,18 +94,119 @@ process.source = cms.Source("PoolSource",
 
     #'/store/mc/RunIIAutumn18MiniAOD/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/00000/062A981D-4A57-664A-A583-E803A658594B.root'
     #'/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/120000/B3F93EA2-04C6-E04E-96AF-CB8FAF67E6BA.root'
+    #'/store/mc/RunIIAutumn18MiniAOD/DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/00000/1F27B94F-20C0-A341-A7AC-8D240C836C21.root'
     #'/store/mc/RunIIAutumn18MiniAOD/VBFHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/240000/F55690CF-BE27-D845-ADD0-4C794EDB202D.root'
     #'/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/20000/9A8D0B74-11F2-A147-AE75-056DE50F66A2.root'
+    #'/store/mc/RunIIAutumn18MiniAOD/ZHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/40000/AF84FB68-A30A-4D4A-9965-82CDCD7AC2E1.root'
     #'/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/60000/11345215-5D59-3A48-8895-86A56D94D62F.root' #ths file for singular matrix 1:86577324
-    #'/store/mc/RunIIAutumn18MiniAOD/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/240000/2C11B23D-6BBC-634B-BBCB-99A49DCA2590.root'
+    #'/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/1/merged_100.root',
+    #'/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/1/merged_1000.root'
+    #'/store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017F/1/merged_100.root'
+    #'/store/data/Run2018A/SingleMuon/MINIAOD/17Sep2018-v2/00000/0034E0CE-45EA-2249-A559-62746A83F4F1.root'
+    #'/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/59/merged_8958.root'
+    #'/store/data/Run2018C/SingleMuon/MINIAOD/17Sep2018-v1/270000/161FC6D9-A2CE-F340-A45C-1BE5C1D68A01.root'
+    #'/store/data/Run2018C/SingleMuon/MINIAOD/17Sep2018-v1/120000/40707AA5-7FB4-CB46-8763-7E92612DFB1C.root'
+    #'/store/data/Run2018D/SingleMuon/MINIAOD/PromptReco-v2/000/325/022/00000/75DF89C5-1538-204F-8E3F-CA967EA985EE.root'
+    #'/store/mc/RunIIAutumn18MiniAOD/EWKWMinus2Jets_WToLNu_M-50_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/80000/389B502B-B27C-B447-A3ED-F0C6062C8C03.root'
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_6547.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_6647.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_6747.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_6847.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_6947.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7047.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7147.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7247.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7347.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7447.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_747.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7547.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7647.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7747.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7847.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_7947.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8047.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8147.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8247.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8347.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8447.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_847.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8547.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8647.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8747.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8847.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_8947.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_9047.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_9147.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_9247.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_9347.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_9447.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_947.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_9547.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/48/merged_9647.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1048.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1148.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1248.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1348.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1448.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_148.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1548.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1648.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1748.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1848.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_1948.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_2048.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_2148.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_2248.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_2348.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_2448.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_248.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_2548.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_2748.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_2848.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_2948.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3048.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3148.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3248.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3348.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3448.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_348.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3548.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3648.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3748.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3848.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_3948.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4048.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4148.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4248.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4348.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4448.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_448.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4548.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4648.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4748.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_48.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4848.root', 
+    '/store/user/aakhmets/gc_storage/MuTau_data_2018ABC_CMSSW1020/TauEmbedding_MuTau_data_2018ABC_CMSSW1020_Run2018B/49/merged_4948.root'
     ),
 )
 
 # process.source.skipEvents = cms.untracked.uint32(968)
-# process.source.eventsToProcess = cms.untracked.VEventRange("1:346516-1:346516") # run only on event=2347130 (syntax= from run:evt - to run:evt)
+# process.source.eventsToProcess = cms.untracked.VEventRange("1:4006-1:4006") # run only on event=2347130 (syntax= from run:evt - to run:evt)
+#process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(
+#    "325022:1152-325022:1152", "325022:1218-325022:1218", "325022:1345-325022:1345", "325022:1038-325022:1038", "325022:1150-325022:1150", 
+#    "325022:1156-325022:1156", "325022:1168-325022:1168", "325022:1200-325022:1200", "325022:1226-325022:1226", "325022:1318-325022:1318", 
+#    "325022:1092-325022:1092", "325022:1141-325022:1141", "325022:1205-325022:1205", "325022:1114-325022:1114", "325022:1144-325022:1144", 
+#    "325022:1149-325022:1149", "325022:1154-325022:1154"
+#)
+#process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange("319991:214-319991:214", "319991:181-319991:181")
 
+#process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange("319579:647-319579:647", "319579:514-319579:514")
+#process.source.lumisToSkip = cms.untracked.VLuminosityBlockRange(
+#	"317212:46-317212:46", "317212:167-317212:167", "317212:168-317212:168", "317527:331-317527:331", "317527:332-317527:332", "317527:336-317527:336",
+#	"317182:481-317182:481", "317182:480-317182:480", "317182:482-317182:482", "317182:488-317182:488", "317320:446-317320:446", "317320:447-317320:447",
+#	"317320:984-317320:984", "317696:207-317696:207", "317696:208-317696:208", "317696:210-317696:210", 
 #Limited nEv for testing purposes. -1 to run all events
-process.maxEvents.input = 1000
+process.maxEvents.input = -1
 
 # JSON mask for data --> defined in the lumiMask file
 # from JSON file

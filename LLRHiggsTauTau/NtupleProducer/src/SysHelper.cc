@@ -59,9 +59,10 @@ SysHelper::SysHelper(Int_t theYear, std::string dataMCstring)
   _isOSpair = false;
   _isIso = false;
   _isMediumID = false;
+  _isTightJetID = false;
   _pairvisMass = -99;
   _Njets = -99;
-  _Nbjets = -99;
+  _Nbtags = -99;
   _leadingjetPt = -99;
   _leadingjetEta = -99;
   _leadingjetPhi = -99;
@@ -87,6 +88,10 @@ SysHelper::SysHelper(Int_t theYear, std::string dataMCstring)
   _PUPPIMETCov11 = -99;
   _pvPhiCP = -99;
   _dpPhiCP = -99;
+  //Triggers
+  _trgIsoMu = false;
+  _extraIsoMu = false;
+  _trgXMuTau = false;
   //Weights
   _wEven = 1.;
   _wOdd = 1.;
@@ -126,15 +131,21 @@ SysHelper::SysHelper(Int_t theYear, std::string dataMCstring)
   _wScaleDown = 1.;
   _wMC = 1.;
   _wSignal = 1.;
+  _wEmb = 1.;
+  _wEmbUp = 1.;
+  _wEmbDown = 1.;
+  _wTot = 1.;
   //Maps
   _TauIDSFmap.clear();
   _MuonIDTrkSFmap.clear();
   _TriggerSFmap.clear();
   _ZpTreweightingmap.clear();
   _ToppTreweightingmap.clear();
-  //A1 LVP & MUON TRACK
+  _EmbeddingSFmap.clear();
+  //A1 LVP & MUON TRACK & TAU TRACK
   A1LVP.clear();
   MuonTrack.clear();
+  TauTrack.clear();
   //Refit Pions
   RefitPionsP4.clear();
   RefitPionsCharge.clear();
@@ -298,9 +309,10 @@ void SysHelper::ResetVariables()
   _isOSpair = false;
   _isIso = false;
   _isMediumID = false;
+  _isTightJetID = false;
   _pairvisMass = -99;
   _Njets = -99;
-  _Nbjets = -99;
+  _Nbtags = -99;
   _leadingjetPt = -99;
   _leadingjetEta = -99;
   _leadingjetPhi = -99;
@@ -323,6 +335,10 @@ void SysHelper::ResetVariables()
   _PUPPImetphi = -99;
   _pvPhiCP = -99;
   _dpPhiCP = -99;
+  //Triggers
+  _trgIsoMu = false;
+  _extraIsoMu = false;
+  _trgXMuTau = false;
   //Weights
   _wPrefiring = 1.;
   _wPrefiringUp = 1.;
@@ -359,12 +375,17 @@ void SysHelper::ResetVariables()
   _wScaleDown = 1.;
   _wMC = 1.;
   _wSignal = 1.;
+  _wEmb = 1.;
+  _wEmbUp = 1.;
+  _wEmbDown = 1.;
+  _wTot = 1.;
   //Maps
   _TauIDSFmap.clear();
   _MuonIDTrkSFmap.clear();
   _TriggerSFmap.clear();
   _ZpTreweightingmap.clear();
   _ToppTreweightingmap.clear();
+  _EmbeddingSFmap.clear();
 }
 
 void SysHelper::GetCollections(const edm::View<pat::CompositeCandidate>* cands_, const edm::View<reco::Candidate>* daus_, const edm::View<pat::Jet>* jets_, const edm::View<pat::Jet>* jetsUp_, const edm::View<pat::Jet>* jetsDown_)
@@ -419,9 +440,11 @@ void SysHelper::FillGenTaus(std::vector<std::vector<unsigned int>> signal_Tauidx
       TVector3 genMuRef(tauandprod_vtx.at(signal_Tauidx.at(i).at(muIdx)).at(2).at(0) - _genPVx,
 		        tauandprod_vtx.at(signal_Tauidx.at(i).at(muIdx)).at(2).at(1) - _genPVy,
 		        tauandprod_vtx.at(signal_Tauidx.at(i).at(muIdx)).at(2).at(2) - _genPVz);
+      //
+      genMuonP4 = math::XYZTLorentzVector(_genMuonpx, _genMuonpy, _genMuonpz, _genMuonE);
+      genTauP4 = math::XYZTLorentzVector(_genTaupx, _genTaupy, _genTaupz, _genTauE);
       //Fill gen CP
       if(tau_JAK.at(tauIdx) == 5) {
-	math::XYZTLorentzVector genMuonP4(_genMuonpx, _genMuonpy, _genMuonpz, _genMuonE);
 	TLorentzVector genHadTauP4(_genTaupx, _genTaupy, _genTaupz, _genTauE);
 	std::vector<std::vector<double>> genPionsP4;
 	std::vector<double> genPionsCharge;
@@ -462,10 +485,11 @@ void SysHelper::GetEventInfo(bool isEmbed, bool isMC, ULong64_t runNumber, Float
   _lumi = lumi;
 }
 
-void SysHelper::GetDecayProducts(std::vector<LorentzVectorParticle> a1lvp, std::vector<TrackParticle> muontrack, std::vector<std::vector<std::vector<double>>> pi_P4, std::vector<std::vector<double>> pi_charges) {
+void SysHelper::GetDecayProducts(std::vector<LorentzVectorParticle> a1lvp, std::vector<TrackParticle> muontrack, std::vector<TrackParticle> tautrack, std::vector<std::vector<std::vector<double>>> pi_P4, std::vector<std::vector<double>> pi_charges) {
 
   A1LVP = a1lvp;
   MuonTrack = muontrack;
+  TauTrack = tautrack;
   RefitPionsP4 = pi_P4;
   RefitPionsCharge = pi_charges;
 }
@@ -531,8 +555,10 @@ void SysHelper::GetJECUnc(std::map<std::string, std::vector<Float_t>> JECmapUp_,
 void SysHelper::GetPrefiringWeights(double pref, double prefUp, double prefDown) {
 
   _wPrefiring = pref;
-  _wPrefiringUp = prefUp;
-  _wPrefiringDown = prefDown;
+  if(prefUp/pref > 1.2) _wPrefiringUp = prefUp;
+  else _wPrefiringUp = pref * 1.2;
+  if(prefDown/pref < 0.8) _wPrefiringDown = prefDown;
+  else _wPrefiringDown = pref * 0.8;
 }
 
 void SysHelper::GetTauSpinnerWeights(const double wEven, const double wOdd, const double wMM) {
@@ -589,8 +615,10 @@ void SysHelper::MakeBranches(TTree *tree, bool isNominal) {
   tree->Branch("isOSpair", &_isOSpair);
   tree->Branch("isIso", &_isIso);
   tree->Branch("isMediumID", &_isMediumID);
+  tree->Branch("isTightJetID", &_isTightJetID);
   tree->Branch("pairvisMass", &_pairvisMass);
   tree->Branch("Njets", &_Njets);
+  tree->Branch("Nbtags", &_Nbtags);
   tree->Branch("leadingjetPt", &_leadingjetPt);
   tree->Branch("leadingjetEta", &_leadingjetEta);
   tree->Branch("leadingjetPhi", &_leadingjetPhi);
@@ -616,9 +644,15 @@ void SysHelper::MakeBranches(TTree *tree, bool isNominal) {
   tree->Branch("PUPPIMETCov11", &_PUPPIMETCov11);
   tree->Branch("pvPhiCP", &_pvPhiCP);
   tree->Branch("dpPhiCP", &_dpPhiCP);
+  tree->Branch("trgIsoMu", &_trgIsoMu);
+  tree->Branch("extraIsoMu", &_extraIsoMu);
+  tree->Branch("trgXMuTau", &_trgXMuTau);
   tree->Branch("MCId", &_Id);
   tree->Branch("Npartons", &_Npartons);
+  tree->Branch("nPU", &_nPU);
   tree->Branch("isData", &_isData);
+  tree->Branch("isMC", &_isMC);
+  tree->Branch("isEmbed", &_isEmbed);
   tree->Branch("isZ", &_isZ);
   tree->Branch("isW", &_isW);
   tree->Branch("isSignal", &_isSignal);
@@ -642,6 +676,8 @@ void SysHelper::MakeBranches(TTree *tree, bool isNominal) {
   tree->Branch("wBtag", &_wBtag);
   tree->Branch("wMC", &_wMC);
   tree->Branch("wSignal", &_wSignal);
+  tree->Branch("wEmb", &_wEmb);
+  tree->Branch("wTot", &_wTot);
   if(isNominal) {
     tree->Branch("wPrefiringUp", &_wPrefiringUp);
     tree->Branch("wPrefiringDown", &_wPrefiringDown);
@@ -665,6 +701,8 @@ void SysHelper::MakeBranches(TTree *tree, bool isNominal) {
     tree->Branch("wPSFSRDown", &_wPSFSRDown);
     tree->Branch("wScaleUp", &_wScaleUp);
     tree->Branch("wScaleDown", &_wScaleDown);
+    tree->Branch("wEmbUp", &_wEmbUp);
+    tree->Branch("wEmbDown", &_wEmbDown);
     tree->Branch("genPVx", &_genPVx);
     tree->Branch("genPVy", &_genPVy);
     tree->Branch("genPVz", &_genPVz);
@@ -728,7 +766,14 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
   _pairvisMass = (tau->p4() + mu->p4()).M();
   _Npartons = Npartons;
   //
-  std::pair<std::vector<math::XYZTLorentzVector>, TVector2> JetsandMET = CorrectedJetsandMET(sysType, var, PUPPImet, mu, tau, JECmap);
+  std::pair<std::vector<math::XYZTLorentzVector>, TVector2> JetsandMET;
+  if(_isMC){
+    JetsandMET = CorrectedJetsandMET(sysType, var, PUPPImet, mu, tau, JECmap);
+  }
+  else{
+    JetsandMET.first = SelectJets(mu, tau, jets, 30., "Nominal");
+    JetsandMET.second = TVector2(PUPPImet.px(),PUPPImet.py());
+  }
   // Jets are corrected from here
   std::vector<math::XYZTLorentzVector> SelectedJets = JetsandMET.first;
   _Njets = SelectedJets.size();
@@ -765,7 +810,7 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
     ShiftedPUPPImet_px = thePUPPImet.Px();
     ShiftedPUPPImet_py = thePUPPImet.Py();
   }
-  if((_isMC && (_isSignal || _isW || _isZ)) && !_isEmbed){
+  if(_isMC && (_isSignal || _isW || _isZ)){
     corrector::METRecoilCorrection(event, generictag, PUPPImet, _Njets, ShiftedPUPPImet_px, ShiftedPUPPImet_py, sysType, var, _recoilPuppiMetCorrector, _recoilPuppiMetShifter);
   }
   // MET is corrected from here
@@ -827,31 +872,34 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
     _muIPsignificance = CP.getIPsignificance(pvcov);
     _pvPhiCP = CP.getPhiCPwithPV();
     _dpPhiCP = CP.getPhiCPwithDP();
+    //
+    _tauSVx = A1LVP.at(_tauIndex).Vertex().X();
+    _tauSVy = A1LVP.at(_tauIndex).Vertex().Y();
+    _tauSVz = A1LVP.at(_tauIndex).Vertex().Z();
+  }  
 
-    //Calculate tau IP and its significance, needed for Fake Factors
-    LorentzVectorParticle TauLVP = A1LVP.at(_tauIndex);
-    TrackParticle TauTrack(TauLVP.getParMatrix(), TauLVP.getCovMatrix(), TauLVP.PDGID(), TauLVP.Mass(), TauLVP.Charge(), TauLVP.BField());
+  //Calculate tau IP and its significance, needed for Fake Factors in DM0 bin
+  if(_tauDM == 0 && TauTrack.at(_tauIndex).Mass() != 0) {
+    TrackParticle tauTrack = TauTrack.at(_tauIndex);
+    LorentzVectorParticle tauLVP(tauTrack.getParMatrix(), tauTrack.getCovMatrix(), tauTrack.PDGID(), tauTrack.Charge(), tauTrack.BField());
 
-    std::vector<float> h_param = {float(TauTrack.Parameter(TrackParticle::kappa)),
-                                  float(TauTrack.Parameter(TrackParticle::lambda)),
-                                  float(TauTrack.Parameter(TrackParticle::phi)),
-                                  float(TauTrack.Parameter(TrackParticle::dxy)),
-                                  float(TauTrack.Parameter(TrackParticle::dz))};
+    std::vector<float> h_param = {float(tauTrack.Parameter(TrackParticle::kappa)),
+				  float(tauTrack.Parameter(TrackParticle::lambda)),
+				  float(tauTrack.Parameter(TrackParticle::phi)),
+				  float(tauTrack.Parameter(TrackParticle::dxy)),
+				  float(tauTrack.Parameter(TrackParticle::dz))};
 
-    ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float> > ref(TauLVP.Parameter(0),TauLVP.Parameter(1),TauLVP.Parameter(2));
+    ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float> > ref(tauLVP.Parameter(0),tauLVP.Parameter(1),tauLVP.Parameter(2));
     ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float> > pvtx(PV.X(),PV.Y(),PV.Z());
 
     ImpactParameter tauIP;
-    TVector3 ip = tauIP.CalculatePCA(TauTrack.BField(), h_param, ref, pvtx);
+    TVector3 ip = tauIP.CalculatePCA(tauTrack.BField(), h_param, ref, pvtx);
     _tauIPx = ip.x();
     _tauIPy = ip.y();
     _tauIPz = ip.z();
-    _tauSVx = TauLVP.Vertex().X();
-    _tauSVy = TauLVP.Vertex().Y();
-    _tauSVz = TauLVP.Vertex().Z();
 
     ROOT::Math::SMatrix<double,5,5, ROOT::Math::MatRepSym<double,5>> helixCov;
-    TMatrixTSym<double> cov = TauLVP.getCovMatrix();
+    TMatrixTSym<double> cov = tauLVP.getCovMatrix();
     SMatrixSym3D SigmaPrV;
     for(int i=0; i<5; i++) {
       for(int j=0; j<5; j++) {
@@ -872,11 +920,13 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
     double uncert = sqrt(ROOT::Math::Dot( ip_svec, ip_cov * ip_svec));
     _tauIPsignificance = mag/uncert;
   }
+ 
   // Various Weights
-  if((_isMC && !_isQCD) || _isEmbed) {
+  if(_isMC  || _isEmbed) {
     _TauIDSFmap = weight::TauIDSF(_tauGenMatch, _tauDM, tau->p4(), _isEmbed, sysType, _w, _Label);
     _MuonIDTrkSFmap = weight:: MuonIDTrkSF(mu->p4(), _muIso, _isEmbed, _w);
-    _TriggerSFmap = weight::TriggerSF(_tauGenMatch, _tauDM, tau->p4(), _muIso, mu->p4(), _theYear, _isEmbed, sysType, _w);
+    if(_isMC) _TriggerSFmap = weight::TriggerSF(_tauGenMatch, _tauDM, tau->p4(), _muIso, mu->p4(), _theYear, _isEmbed, sysType, _w);
+    else if(_isEmbed) _TriggerSFmap = weight::TriggerSF(_tauGenMatch, _tauDM, genTauP4, _muIso, genMuonP4, _theYear, _isEmbed, sysType, _w);
     _wIDvsJet = _TauIDSFmap["wIDvsJet"];
     _wIDvsEle = _TauIDSFmap["wIDvsEle"];
     _wIDvsMu = _TauIDSFmap["wIDvsMu"];
@@ -897,6 +947,14 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
       _wTrgDown = _TriggerSFmap["wTrgDown"];
     }
     //
+    if(_isEmbed) {
+      _EmbeddingSFmap = weight::EmbeddingSF(_tauGenMatch, _tauDM, sysType);
+      _wEmb = _EmbeddingSFmap["wEmb"];
+      if(sysType == "Nominal") {
+	_wEmbUp = _EmbeddingSFmap["wEmbUp"];
+        _wEmbDown = _EmbeddingSFmap["wEmbDown"];
+      }
+    }
     if(!_isEmbed) {
       _wPU = weight::PileUpreweighting(_nPU, _PU_data, _PU_mc);
       if(_isZ) {
@@ -927,6 +985,7 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
 	}
       }
     }
+    _wTot*=_wIDvsJet*_wIDvsMu*_wIDvsEle*_wIDMu*_wTrkMu*_wTrg*_wMC*_wPU*_wZpT*_wToppT*_wSignal*_wBtag*_wPrefiring*_wEmb;
   }
   tree->Fill();
 }
@@ -1030,6 +1089,7 @@ std::vector<math::XYZTLorentzVector> SysHelper::SelectJets(const reco::Candidate
 
   std::vector<const pat::Jet*> SelectedPATJets;
   std::vector<math::XYZTLorentzVector> JetsP4Vect;
+  _Nbtags = 0;
   //
   for(edm::View<pat::Jet>::const_iterator ijet=jets->begin(); ijet!=jets->end(); ++ijet) {
 
@@ -1046,35 +1106,45 @@ std::vector<math::XYZTLorentzVector> SysHelper::SelectJets(const reco::Candidate
     int NumConst = ijet->chargedMultiplicity()+NumNeutralParticles;
     float CHM = ijet->chargedMultiplicity();
     float absjeta = fabs(ijet->eta());
-    bool tightJetID = false;
-
+    //
+    _isTightJetID = false;
     // 2016 data
     if(_theYear == 2016) {
-      if(absjeta <= 2.7) tightJetID = ( (NHF<0.90 && NEMF<0.90 && NumConst>1) && ((absjeta<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || absjeta>2.4) );
-      else if(absjeta <= 3.0) tightJetID = (NEMF>0.01 && NHF<0.98 && NumNeutralParticles>2 );
-      else tightJetID = (NEMF<0.90 && NumNeutralParticles>10 );
+      if(absjeta <= 2.7) _isTightJetID = ( (NHF<0.90 && NEMF<0.90 && NumConst>1) && ((absjeta<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || absjeta>2.4) );
+      else if(absjeta <= 3.0) _isTightJetID = (NEMF>0.01 && NHF<0.98 && NumNeutralParticles>2 );
+      else _isTightJetID = (NEMF<0.90 && NumNeutralParticles>10 );
     }
     // 2017 data
     else if(_theYear == 2017) {
-      if(absjeta <= 2.7) tightJetID = ( (NHF<0.90 && NEMF<0.90 && NumConst>1) && ((absjeta<=2.4 && CHF>0 && CHM>0) || absjeta>2.4) );
-      else if(absjeta <= 3.0) tightJetID = (NEMF>0.02 && NEMF<0.99 && NumNeutralParticles>2 );
-      else tightJetID = (NEMF<0.90 && NHF>0.02 && NumNeutralParticles>10 );
+      if(absjeta <= 2.7) _isTightJetID = ((NHF<0.90 && NEMF<0.90 && NumConst>1) && ((absjeta<=2.4 && CHF>0 && CHM>0) || absjeta>2.4));
+      else if(absjeta <= 3.0) _isTightJetID = (NEMF>0.02 && NEMF<0.99 && NumNeutralParticles>2 );
+      else _isTightJetID = (NEMF<0.90 && NHF>0.02 && NumNeutralParticles>10 );
     }
     // 2018 data
     else if(_theYear == 2018) {
-      if(absjeta <= 2.6) tightJetID = ( NHF<0.90 && NEMF<0.90 && NumConst>1 && CHF>0 && CHM>0 );
-      else if(absjeta>2.6 && absjeta <= 2.7) tightJetID = ( NHF<0.90 && NEMF<0.99 && CHM>0 );
-      else if(absjeta>2.7 && absjeta <= 3.0) tightJetID = ( NEMF>0.02 && NEMF<0.99 && NumNeutralParticles>2 );
-      else tightJetID = (NEMF<0.90 && NHF>0.2 && NumNeutralParticles>10 );
+      if(absjeta <= 2.6) _isTightJetID = ( NHF<0.90 && NEMF<0.90 && NumConst>1 && CHF>0 && CHM>0 );
+      else if(absjeta>2.6 && absjeta <= 2.7) _isTightJetID = ( NHF<0.90 && NEMF<0.99 && CHM>0 );
+      else if(absjeta>2.7 && absjeta <= 3.0) _isTightJetID = ( NEMF>0.02 && NEMF<0.99 && NumNeutralParticles>2 );
+      else _isTightJetID = (NEMF<0.90 && NHF>0.2 && NumNeutralParticles>10 );
     }
-
-    if(ijet->pt()<pTcut || abs(ijet->eta())>4.7 || deltaR(ijet->p4(),cand1->p4())<0.5 || deltaR(ijet->p4(),cand2->p4())<0.5 || !tightJetID) continue;
+    //
+    if(ijet->pt()<pTcut || abs(ijet->eta())>4.7 || deltaR(ijet->p4(),cand1->p4())<0.5 || deltaR(ijet->p4(),cand2->p4())<0.5) continue;
+    //
+    double CSVcut = 0.;
+    if(_theYear == 2016) CSVcut = 0.6321;
+    else if(_theYear == 2017) CSVcut = 0.4941;
+    else if(_theYear == 2018) CSVcut = 0.4184;
+    //
+    if((ijet->bDiscriminator("pfDeepCSVJetTags:probb")+ijet->bDiscriminator("pfDeepCSVJetTags:probbb"))>CSVcut && ijet->pt()>20 && abs(ijet->eta())<2.4) {
+      _Nbtags += 1;
+    }
+    //
     JetsP4Vect.push_back(ijet->p4());
     SelectedPATJets.push_back(&(*ijet));
   }
 
   // BTagging
-  if((_isMC && !_isQCD) || _isEmbed) {
+  if(_isMC) {
     std::map<std::string, double> BTaggingSFmap = weight::BTaggingSF(SelectedPATJets, _theYear, sysType, _histbtagEfficiency, _btagCalib, _btagReader);
     _wBtag = BTaggingSFmap["wBtag"];
     if(sysType == "Nominal") {
@@ -1089,11 +1159,20 @@ std::vector<math::XYZTLorentzVector> SysHelper::SelectJets(const reco::Candidate
 bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Event& event, std::vector<math::XYZTLorentzVector> LeptonP4, bool trig, std::vector<Long64_t> _daughters_trgMatched)
 {
   int Npairs = 0;
-  math::XYZTLorentzVector TauP4Corrected, MuonP4;
+  math::XYZTLorentzVector TauP4, MuonP4;
   std::vector<pat::CompositeCandidate> candVector;
 
   for(edm::View<pat::CompositeCandidate>::const_iterator candi = cands->begin(); candi!=cands->end();++candi) {
     pat::CompositeCandidate cand = (*candi);
+
+    int tauIndex=-99,muonIndex=-99;
+    double dRmin1=0.00001;
+    double dRmin2=0.00001;
+    for(unsigned int i=0;i<LeptonP4.size();i++)
+      {
+        if(abs(deltaR(LeptonP4.at(i),cand.daughter(0)->p4()))<dRmin1){muonIndex=i;dRmin1=deltaR(LeptonP4.at(i),cand.daughter(0)->p4());}
+        if(abs(deltaR(LeptonP4.at(i),cand.daughter(1)->p4()))<dRmin2){tauIndex=i;dRmin2=deltaR(LeptonP4.at(i),cand.daughter(1)->p4());}
+      }
 
     float decayMode=-1.;
     int decayModeFindingNewDMs=-1;
@@ -1108,13 +1187,18 @@ bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Even
         genMatch = seltools::GenMatch(cand.daughter(1), event, generictag);
       }
       else genMatch = 6;
-      //!\/
+      //
       if(_isMC){
-        if(sysType == "TES") TauP4Corrected = corrector::P4Corrected(cand.daughter(1)->p4(),genMatch,decayMode, var, _histTES, _histFES);
-        else TauP4Corrected = corrector::P4Corrected(cand.daughter(1)->p4(),genMatch,decayMode, "Nom", _histTES, _histFES);
-        cand.daughter(1)->setP4(TauP4Corrected);
+        if(sysType == "TES") TauP4 = corrector::TauP4Corrected(cand.daughter(1)->p4(),genMatch,decayMode, var, _histTES, _histFES);
+        else TauP4 = corrector::TauP4Corrected(cand.daughter(1)->p4(),genMatch,decayMode, "Nom", _histTES, _histFES);
+        cand.daughter(1)->setP4(TauP4);
       }
-      else TauP4Corrected = cand.daughter(1)->p4();
+      else if(_isEmbed){
+        if(sysType == "TES") TauP4 = corrector::embTauP4Corrected(cand.daughter(1)->p4(),genMatch,decayMode, var);
+        else TauP4 = corrector::embTauP4Corrected(cand.daughter(1)->p4(),genMatch,decayMode, "Nom");
+        cand.daughter(1)->setP4(TauP4);
+      }
+      else TauP4 = cand.daughter(1)->p4();
       //
       byVVVLooseDeepTau2017v2p1VSjet=userdatahelpers::getUserInt (cand.daughter(1), "byVVVLooseDeepTau2017v2p1VSjet");
       byMediumDeepTau2017v2p1VSjet=userdatahelpers::getUserInt (cand.daughter(1), "byMediumDeepTau2017v2p1VSjet");
@@ -1132,7 +1216,7 @@ bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Even
     bool DiLepton = false, ThirdLepton = false;
     for(edm::View<reco::Candidate>::const_iterator daui = daus->begin(); daui!=daus->end();++daui){
       const reco::Candidate* candi = &(*daui);
-      if(deltaR(candi->p4(),TauP4Corrected)>0.5 && deltaR(candi->p4(),MuonP4)>0.5){
+      if(deltaR(candi->p4(),TauP4)>0.5 && deltaR(candi->p4(),MuonP4)>0.5){
 	if(seltools::EleVeto(candi) || seltools::MuVeto(candi)) ThirdLepton = true;
       }
       for(edm::View<reco::Candidate>::const_iterator dauj = daus->begin(); dauj!=daus->end();++dauj){
@@ -1143,9 +1227,9 @@ bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Even
     }
     if(DiLepton == true || ThirdLepton == true) return false; 
     //pT
-    if(TauP4Corrected.Pt()<20 || MuonP4.Pt()<20) continue;
+    if(TauP4.Pt()<20 || MuonP4.Pt()<20) continue;
     //eta
-    if(std::abs(MuonP4.Eta())>2.4 || std::abs(TauP4Corrected.Eta())>2.3) continue;
+    if(std::abs(MuonP4.Eta())>2.4 || std::abs(TauP4.Eta())>2.3) continue;
     //dz
     if(std::abs(userdatahelpers::getUserFloat(cand.daughter(0),"dz")) > 0.2 || std::abs(userdatahelpers::getUserFloat(cand.daughter(1),"dz")) > 0.2) continue;
     //dxy
@@ -1163,55 +1247,48 @@ bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Even
     //We remove OS cut to keep SS region for DNN training and fake factors, save boolean instead for analysis
     if(cand.daughter(1)->charge()*cand.daughter(0)->charge()<0) _isOSpair = true; 
     //delta R
-    if(deltaR(TauP4Corrected,MuonP4)<0.5) continue;
-    int tauIndex=-99,muonIndex=-99;
-    double dRmin1=0.00001;
-    double dRmin2=0.00001;
-    for(unsigned int i=0;i<LeptonP4.size();i++)
-      {
-	if(abs(deltaR(LeptonP4.at(i),cand.daughter(0)->p4()))<dRmin1){muonIndex=i;dRmin1=deltaR(LeptonP4.at(i),cand.daughter(0)->p4());}
-	if(abs(deltaR(LeptonP4.at(i),cand.daughter(1)->p4()))<dRmin2){tauIndex=i;dRmin2=deltaR(LeptonP4.at(i),cand.daughter(1)->p4());}
-      }
-
-    if(tauIndex!=-99 && muonIndex!=-99)
-      {
-        if(trig && _theYear == 2016){
-	  if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1);
-	  else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),3) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1);
-	  else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),4) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1);
-	  else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),6) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1);
-	  else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),19) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),19));
-          else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),20) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),20));
-	  else continue;
-	}
-        else if(trig && _theYear == 2017){
-	  if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),0) && MuonP4.pt()>25);
-          else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),1) && MuonP4.pt()>25);
-          else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),4) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),4) && MuonP4.pt()>21 && TauP4Corrected.pt()>32 && std::abs(TauP4Corrected.eta())<2.1);
-          else continue;
-	}
-        else if(trig && _theYear == 2018){
-	  if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),0) && MuonP4.pt()>25);
-          else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2) && MuonP4.pt()>25);
-	  else if(_isMC || (_isData && _runNumber>317509)){
-	    if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),8) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),8) && MuonP4.pt()>21 && std::abs(MuonP4.eta())<2.1 && TauP4Corrected.pt()>32 && std::abs(TauP4Corrected.eta())<2.1);
-	    else continue;
-          }
-          else if(_isData && _runNumber<=317509){
-	    if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),13) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),7) && MuonP4.pt()>21 && std::abs(MuonP4.eta())<2.1 && TauP4Corrected.pt()>32 && std::abs(TauP4Corrected.eta())<2.1);
-	    else continue;
-	  }
-          else if(_isEmbed){
-            if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),7) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),7) && MuonP4.pt()>21 && std::abs(MuonP4.eta())<2.1 && TauP4Corrected.pt()>32 && std::abs(TauP4Corrected.eta())<2.1);
-            else continue;
-          }
-        }
+    if(deltaR(TauP4,MuonP4)<0.5) continue;
+    //visible mass
+    if((TauP4+MuonP4).M()<40) continue;
+    //
+    bool isomu27 = false;
+    bool isomu24_2p1 = false;
+    bool isomu24 = false;
+    if(tauIndex!=-99 && muonIndex!=-99) {
+      if(_isEmbed) trig = true;
+      if(trig && _theYear == 2016){
+        if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1) _trgIsoMu = true;
+	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),3) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1) _trgIsoMu = true;
+	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),4) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1) _trgIsoMu = true;
+	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),6) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1) _trgIsoMu = true;
+	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),19) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),19)) _trgXMuTau = true;
+        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),20) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),20)) _trgXMuTau = true;
 	else continue;
       }
+      else if(trig && _theYear == 2017){
+	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),0) && MuonP4.pt()>25) _trgIsoMu = true;
+        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),1) && MuonP4.pt()>25) _trgIsoMu = true;
+        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),4) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),4) && MuonP4.pt()>21 && TauP4.pt()>32 && std::abs(TauP4.eta())<2.1) _trgXMuTau = true;
+        else continue;
+      }
+      if(trig && _theYear == 2018){
+	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2) && MuonP4.pt()>25) {_trgIsoMu = true; isomu27 = true;}
+        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),1) && MuonP4.pt()>25) {_trgIsoMu = true; isomu24_2p1 = true;}
+        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),0) && MuonP4.pt()>25) {_trgIsoMu = true; isomu24 = true;}
+        //
+        else if(_isData && _runNumber<=317509) {
+	  if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),13) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),13) && MuonP4.pt()>21 && std::abs(MuonP4.eta())<2.1 && TauP4.pt()>32 && std::abs(TauP4.eta())<2.1) _trgXMuTau = true;
+        }
+	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),7) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),7) && MuonP4.pt()>21 && std::abs(MuonP4.eta())<2.1 && TauP4.pt()>32 && std::abs(TauP4.eta())<2.1) _trgXMuTau = true;
+      }
+      else continue;
+    }
+    if(!isomu24 && !isomu27 && isomu24_2p1) _extraIsoMu = true;
+    if(!(_trgIsoMu || _trgXMuTau)) continue;
     candVector.push_back(cand);
     Npairs++;
   }
-  if(Npairs!=0 && (TauP4Corrected+MuonP4).M()>40) {
+  if(Npairs!=0) {
     std::sort(candVector.begin(),candVector.end(),seltools::ComparePairsbyIso);
     SelectedPair = candVector.at(0);
     return true;
@@ -1225,7 +1302,7 @@ void SysHelper::GetSampleType() {
   if(_Idstr=="w_lnu" || _Idstr=="w_1qlnu" || _Idstr=="w_2qlnu" || _Idstr=="w_3qlnu" || _Idstr=="w_4qlnu") _isW = true;
   if(_Idstr=="h_tautau_ggf" || _Idstr=="h_tautau_vbf" || _Idstr=="zh_tautau" || _Idstr=="wplush_tautau" || _Idstr=="wminush_tautau") _isSignal = true;
   if(_Idstr=="qcd") _isQCD = true;
-  if(_Idstr=="wz_2l2q" || _Idstr=="wz_3l1nu" || _Idstr=="wz_1l3nu" || _Idstr=="wz_1l1nu2q" || _Idstr=="zz_4l" || _Idstr=="zz_2l2nu" || _Idstr=="zz_2l2q" || _Idstr=="ww_2l2nu" || _Idstr=="ww_1l1nu2q") _isVV = true;
+  if(_Idstr=="wz_2l2q" || _Idstr=="wz_3l1nu" || _Idstr=="wz_1l3nu" || _Idstr=="wz_1l1nu2q" || _Idstr=="zz_4l" || _Idstr=="zz_2l2nu" || _Idstr=="zz_2l2q" || _Idstr=="ww_2l2nu" || _Idstr=="ww_1l1nu2q" || _Idstr=="vv_2l2nu") _isVV = true;
   if(_Idstr=="ttbar_dilep" || _Idstr=="ttbar_hadr" || _Idstr=="ttbar_semilep") _isTTbar = true;
   if(_Idstr=="tw" || _Idstr=="tbarw" || _Idstr=="st_tchannel_top" || _Idstr=="st_tchannel_antitop") _isSingleTop = true;
 }

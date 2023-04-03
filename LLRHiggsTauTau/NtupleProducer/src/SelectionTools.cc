@@ -8,7 +8,7 @@ bool seltools::EleVeto(const reco::Candidate* cand)
         if(userdatahelpers::getUserFloat(cand,"isEleNoIsoID90") == 1){
           if(userdatahelpers::getUserInt(cand,"isConversionVeto") == 1){
             if(userdatahelpers::getUserInt(cand,"missingHit")<=1){
-              if(userdatahelpers::getUserFloat(cand,"combRelIsoPF")<(0.3*cand->pt())){
+              if(userdatahelpers::getUserFloat(cand,"combRelIsoPF")<0.3){
                 return true;
               }
             }
@@ -26,7 +26,7 @@ bool seltools::MuVeto(const reco::Candidate* cand)
     if(cand->pt()>10 && std::abs(cand->eta())<2.4){
       if(std::abs(userdatahelpers::getUserFloat(cand,"dxy")) < 0.045 && std::abs(userdatahelpers::getUserFloat(cand,"dz")) < 0.2){
         if(seltools::CHECK_BIT(userdatahelpers::getUserInt(cand,"muonID"),2)){
-          if(userdatahelpers::getUserFloat(cand,"combRelIsoPF")<(0.3*cand->pt())){
+          if(userdatahelpers::getUserFloat(cand,"combRelIsoPF")<0.3){
             return true;
           }
         }
@@ -47,7 +47,7 @@ bool seltools::DiEle(const reco::Candidate* cand1, const reco::Candidate* cand2)
           kin = (cand1->pt()>15 && cand2->pt()>15 && fabs(cand1->eta())<2.5 && fabs(cand2->eta())<2.5);
           vertex = (fabs(userdatahelpers::getUserFloat(cand1,"dxy"))<0.045 && fabs(userdatahelpers::getUserFloat(cand2,"dxy"))< 0.045 && fabs(userdatahelpers::getUserFloat(cand1,"dz")) < 0.2 && fabs(userdatahelpers::getUserFloat(cand2,"dz")) < 0.2);
           isele=(userdatahelpers::getUserFloat(cand1,"isEleNoIsoID90") && userdatahelpers::getUserFloat(cand2,"isEleNoIsoID90"));
-          iso= (userdatahelpers::getUserFloat(cand1,"combRelIsoPF") < (0.3*cand1->pt()) && userdatahelpers::getUserFloat(cand2,"combRelIsoPF")<(0.3*cand2->pt()));
+          iso= (userdatahelpers::getUserFloat(cand1,"combRelIsoPF")<0.3 && userdatahelpers::getUserFloat(cand2,"combRelIsoPF")<0.3);
           if((kin && vertex && isele && iso)==1)return true;
         }
     }
@@ -66,7 +66,7 @@ bool seltools::DiMuon(const reco::Candidate* cand1, const reco::Candidate* cand2
           kin = (cand1->pt()>15 && cand2->pt()>15 && fabs(cand1->eta())<2.4 && fabs(cand2->eta())<2.4);
           vertex = (fabs(userdatahelpers::getUserFloat(cand1,"dxy"))<0.045 && fabs(userdatahelpers::getUserFloat(cand2,"dxy"))< 0.045 && fabs(userdatahelpers::getUserFloat(cand1,"dz")) < 0.2 && fabs(userdatahelpers::getUserFloat(cand2,"dz")) < 0.2);
           isele=((userdatahelpers::getUserFloat(cand1,"isPFMuon") && userdatahelpers::getUserFloat(cand2,"isPFMuon")) && (userdatahelpers::getUserFloat(cand1,"isGlobalMuon") && userdatahelpers::getUserFloat(cand2,"isGlobalMuon")) && (userdatahelpers::getUserFloat(cand1,"isTrackerMuon") && userdatahelpers::getUserFloat(cand2,"isTrackerMuon")));
-          iso= (userdatahelpers::getUserFloat(cand1,"combRelIsoPF") < (0.3*cand1->pt()) && userdatahelpers::getUserFloat(cand2,"combRelIsoPF")<(0.3*cand2->pt()));
+          iso= (userdatahelpers::getUserFloat(cand1,"combRelIsoPF")<0.3 && userdatahelpers::getUserFloat(cand2,"combRelIsoPF")<0.3);
           if((kin && vertex && isele && iso)==1)return true;
         }
     }

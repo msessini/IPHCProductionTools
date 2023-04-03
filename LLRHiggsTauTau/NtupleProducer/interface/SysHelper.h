@@ -43,7 +43,7 @@ class SysHelper{
   void GetGenInfo(edm::EDGetTokenT<edm::View<pat::GenericParticle>> generictag_, std::map<std::string, double> theomap, Int_t dataMCtype);
   void FillGenTaus(std::vector<std::vector<unsigned int>> signal_Tauidx, std::vector<std::vector<std::vector<double>>> tauandprod_p4, std::vector<std::vector<int>> tauandprod_charge, std::vector<std::vector<std::vector<double>>> tauandprod_vtx, std::vector<std::vector<int>> taudandprod_pdgid, std::vector<unsigned int> tau_JAK);
   void GetEventInfo(bool isEmbed, bool isMC, ULong64_t runNumber, Float_t nPU, ULong64_t evtidx, Int_t lumi);
-  void GetDecayProducts(std::vector<LorentzVectorParticle> a1lvp, std::vector<TrackParticle> muontrack, std::vector<std::vector<std::vector<double>>> pi_P4, std::vector<std::vector<double>> pi_charges);
+  void GetDecayProducts(std::vector<LorentzVectorParticle> a1lvp, std::vector<TrackParticle> muontrack, std::vector<TrackParticle> tautrack, std::vector<std::vector<std::vector<double>>> pi_P4, std::vector<std::vector<double>> pi_charges);
   void GetPV(std::vector<float> _RefitPVBS_x, std::vector<float> _RefitPVBS_y, std::vector<float> _RefitPVBS_z, std::vector<std::vector<std::vector<double>>> _RefitPVBS_Cov, std::vector<size_t> _VertexHashBS1, std::vector<size_t> _VertexHashBS2, std::vector<size_t> _LeptonHash);
   bool FillPV(int tauIndex, int muIndex);
   void GetMETCov(float cov00, float cov10, float cov11);
@@ -85,6 +85,8 @@ class SysHelper{
   float _muIPz;
   float _muIPsignificance;
   //Gen
+  math::XYZTLorentzVector genMuonP4;
+  math::XYZTLorentzVector genTauP4;
   float _genTaupx;
   float _genTaupy;
   float _genTaupz;
@@ -104,13 +106,18 @@ class SysHelper{
   float _genPVz;
   double _gendpPhiCP;
   double _genpvPhiCP;
+  //Triggers
+  bool _trgIsoMu;
+  bool _extraIsoMu;
+  bool _trgXMuTau;
   //Jets, Pair and MET
   bool _isOSpair;
   bool _isIso;
   bool _isMediumID;
+  bool _isTightJetID;
   double _pairvisMass;
   int _Njets;
-  int _Nbjets;
+  int _Nbtags;
   double _leadingjetPt;
   double _leadingjetEta;
   double _leadingjetPhi;
@@ -175,6 +182,10 @@ class SysHelper{
   double _wScaleDown;
   double _wMC;
   double _wSignal;
+  double _wEmb;
+  double _wEmbUp;
+  double _wEmbDown;
+  double _wTot;
   //Maps
   std::map<std::string, double> _TauIDSFmap;
   std::map<std::string, double> _MuonIDTrkSFmap;
@@ -182,10 +193,11 @@ class SysHelper{
   std::map<std::string, double> _ZpTreweightingmap;
   std::map<std::string, double> _ToppTreweightingmap;
   std::map<std::string, double> _TheoreticalUncmap;
-
-  //A1 LVP & MUON TRACK
+  std::map<std::string, double> _EmbeddingSFmap;
+  //A1 LVP & MUON TRACK & TAU TRACK
   std::vector<LorentzVectorParticle> A1LVP;
   std::vector<TrackParticle> MuonTrack;
+  std::vector<TrackParticle> TauTrack;
   //Refit Pions
   std::vector<std::vector<std::vector<double>>> RefitPionsP4;
   std::vector<std::vector<double>> RefitPionsCharge;

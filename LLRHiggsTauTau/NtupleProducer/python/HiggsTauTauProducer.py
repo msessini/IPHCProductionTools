@@ -57,25 +57,26 @@ except NameError:
 ### Trigger list
 ### ----------------------------------------------------------------------
 if YEAR == 2016:
-  print 'Using HLT trigger 2016'
-  execfile(PyFilePath+"python/triggers_80X.py")  # 2016 triggers and filters
+  if IsEmbed:
+    print 'Using HLT trigger 2016 (embed)'
+    execfile(PyFilePath+"python/triggers_80X_Embed.py")  # 2016 triggers and filters
+  else:
+    print 'Using HLT trigger 2016'
+    execfile(PyFilePath+"python/triggers_80X.py")  # 2016 triggers and filters
 if YEAR == 2017:
-  print 'Using HLT trigger 2017'
-  execfile(PyFilePath+"python/triggers_92X.py")  # 2017 triggers and filters
+  if IsEmbed:
+    print 'Using HLT trigger 2017 (embed)'
+    execfile(PyFilePath+"python/triggers_92X_Embed.py")  # 2017 triggers and filters
+  else:
+    print 'Using HLT trigger 2017'
+    execfile(PyFilePath+"python/triggers_92X.py")  # 2017 triggers and filters
 if YEAR == 2018:
-  print 'Using HLT trigger 2018'
-  execfile(PyFilePath+"python/triggers_102X.py") # 2018 triggers and filters
-
-if IsEmbed:
-    if YEAR == 2016:
-        print 'Using HLT trigger 2016'
-        execfile(PyFilePath+"python/triggers_80X_Embed.py")  # 2016 triggers and filters
-    if YEAR == 2017:
-        print 'Using HLT trigger 2017'
-        execfile(PyFilePath+"python/triggers_92X_Embed.py")  # 2017 triggers and filters
-    if YEAR == 2018:
-        print 'Using HLT trigger 2018'
-        execfile(PyFilePath+"python/triggers_102X_Embed.py") # 2018 triggers and filters
+  if IsEmbed:
+    print 'Using HLT trigger 2018 (embed)'
+    execfile(PyFilePath+"python/triggers_102X_Embed.py") # 2018 triggers and filters
+  else:
+    print 'Using HLT trigger 2018'
+    execfile(PyFilePath+"python/triggers_102X.py") # 2018 triggers and filters
 
 ### ----------------------------------------------------------------------
 ### Set the GT
@@ -1097,7 +1098,7 @@ process.EvntCounterA = cms.EDAnalyzer('EventCounter',
                                       gensrccounter = cms.InputTag('prunedGenParticles'),
                                       GenEventInfo   = cms.InputTag('generator'),
                                       IsEmbed= cms.bool(IsEmbed),
-                                      DataMCType    = cms.untracked.string("DY_mutau_embedded")
+				       DataMCType    = cms.untracked.string("DY_mutau_embedded")
 )
 
 

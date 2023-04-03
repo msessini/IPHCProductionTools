@@ -120,7 +120,7 @@ void corrector::METRecoilCorrection(const edm::Event& event, edm::EDGetTokenT<ed
   }
 }
 
-math::XYZTLorentzVector corrector::P4Corrected(math::XYZTLorentzVector p4, int genmatch, int DM, std::string Unc, TH1* histTES, TGraph* histFES){
+math::XYZTLorentzVector corrector::TauP4Corrected(math::XYZTLorentzVector p4, int genmatch, int DM, std::string Unc, TH1* histTES, TGraph* histFES){
 
   double ShiftP = 1.;
   double ShiftM = 1.;
@@ -187,7 +187,7 @@ math::XYZTLorentzVector corrector::P4Corrected(math::XYZTLorentzVector p4, int g
       ShiftM += UncFES;
     }
 
-    if(DM==1) ShiftM = 1.; //Pion mass is not shifted
+    if(DM==0) ShiftM = 1.; //Pion mass is not shifted
   }
 
   if(genmatch==2 || genmatch==4) { // For genuine muons
@@ -210,6 +210,55 @@ math::XYZTLorentzVector corrector::P4Corrected(math::XYZTLorentzVector p4, int g
   double en_scaled = std::sqrt(px_scaled*px_scaled + py_scaled*py_scaled + pz_scaled*pz_scaled + mass_scaled*mass_scaled);
 
   return math::XYZTLorentzVector(px_scaled, py_scaled, pz_scaled, en_scaled);
+}
+
+math::XYZTLorentzVector corrector::embTauP4Corrected(math::XYZTLorentzVector p4, int genmatch, int DM, std::string Unc){
+
+  double scale = 0.;
+  double px_scaled = p4.Px();
+  double py_scaled = p4.Py();
+  double pz_scaled = p4.Pz();
+  double m_scaled = p4.M();
+  double E_scaled = p4.energy();
+  //
+  if(genmatch == 5) {
+    if(DM==0) { // 1 prong
+      scale = -0.0033;
+      if(Unc=="Up") scale += 0.0039;
+      if(Unc=="Down") scale -= 0.0039;
+    }
+    if(DM==1) { // 1 prong + pi0
+      scale = -0.0057;
+      if(Unc=="Up") scale += 0.0037;
+      if(Unc=="Down") scale -= 0.0031;
+    }
+    if(DM==10 || DM==11) { // 3 prong
+      scale = -0.0074;
+      if(Unc=="Up") scale += 0.0032;
+      if(Unc=="Down") scale -= 0.0032;
+    }
+  }
+  //
+  if(genmatch == 1 || genmatch == 3) {
+    if(std::abs(p4.eta()) < 1.479) { // barrel electrons
+      scale = -0.0033;
+      if(Unc=="Up") scale += 0.0050;
+      if(Unc=="Down") scale -= 0.0050;
+    }
+    if(std::abs(p4.eta()) > 1.479) { // endcap electrons
+      scale = -0.0056;
+      if(Unc=="Up") scale += 0.0125;
+      if(Unc=="Down") scale -= 0.0125;
+    }
+  }
+  //
+  px_scaled *= (1 + scale);
+  py_scaled *= (1 + scale);
+  pz_scaled *= (1 + scale);
+  if(DM != 0) m_scaled *= (1 + scale); //pion mass is not shifted 
+  E_scaled = std::sqrt(px_scaled*px_scaled + py_scaled*py_scaled + pz_scaled*pz_scaled + m_scaled*m_scaled);
+  //
+  return math::XYZTLorentzVector(px_scaled, py_scaled, pz_scaled, E_scaled);
 }
 
 math::XYZTLorentzVector corrector::MuP4Corrected(math::XYZTLorentzVector p4, std::string Unc)
@@ -311,28 +360,6 @@ std::map<std::string, double> weight::ToppTreweighting(const edm::Event& event, 
     ToppTreweightingmap["wToppTDown"] = 1;
   }
   return ToppTreweightingmap;
-}
-
-std::map<std::string, double> weight::PrefiringWeight(double pref, double prefUp, double prefDown, Int_t theYear, std::string sysType) {
-
-  std::map<std::string, double> PrefiringWeightmap;
-  //
-  double prefw = 1.;
-  if(theYear==2016 || theYear==2017) {
-    prefw = pref;
-    if(sysType == "Nominal") {
-      double prefwUp = prefUp;
-      double prefwDown = prefDown;
-      //
-      if((prefwUp/prefw)<1.2) prefwUp = prefw*1.2;
-      if((prefwDown/prefw)>0.8) prefwDown = prefw*0.8;
-      PrefiringWeightmap["wPrefiringUp"] = prefwUp;
-      PrefiringWeightmap["wPrefiringDown"] = prefwDown;
-    }
-  }
-  PrefiringWeightmap["wPrefiringWT"] = prefw;
-  //
-  return PrefiringWeightmap;
 }
 
 std::map<std::string, double> weight::TauIDSF(int genmatch, float DM, math::XYZTLorentzVector p4, bool isEmbed, std::string sysType, std::shared_ptr<RooWorkspace> w, std::string Label) {
@@ -564,6 +591,39 @@ std::map<std::string, double> weight::BTaggingSF(std::vector<const pat::Jet*> se
   return BTaggingSFmap;
 }
 
+std::map<std::string, double> weight::EmbeddingSF(int genmatch, float DM, std::string sysType) {
+  std::map<std::string, double> embSFmap;
+  double w = 1.;
+  double wUp = 1.;
+  double wDown = 1.;
+  if(genmatch == 5) {
+    if(DM==0) w = 0.975;
+    else if(DM==1) w = 0.975 * 1.051;
+    else if(DM==10) w = pow(0.975,3);
+    //
+    if(sysType == "Nominal") {
+      if(DM==0) {
+        wUp = 0.983;
+	wDown = 0.967;
+      }
+      if(DM==1) {
+        wUp = 0.983 * 1.065;
+        wDown = 0.967 * 1.036;
+      }
+      if(DM==10) {
+        wUp = pow(0.983,3);
+        wDown = pow(0.967,3);
+      }	
+    }   
+  }
+  embSFmap["wEmb"] = w;
+  if(sysType == "Nominal") {
+    embSFmap["wEmbUp"] = wUp;
+    embSFmap["wEmbDown"] = wDown;
+  }
+  return embSFmap;
+}
+
 //////
 
 double weight::SignalReweighting(Int_t theYear, std::string id) {
@@ -606,28 +666,5 @@ double weight::PileUpreweighting(float nPU, TH1D* PU_data, TH1D* PU_mc) {
   return wPU;
 }
 
-double Stitching(Int_t theYear, int id, int taugenmatch, int mugenmatch, double mvis, bool isZ, bool isW, int Npartons) {
 
-  /*bool isTausample = true;
-  if(taugenmatch == 1 || taugenmatch == 2 || mugenmatch == 1 || mugenmatch == 2) isTausample = false;
-  // 
-  double wStitch = 1.;
-  //
-  if(isZ && isTausample) {
-    if(id == DataMCType::DY_ll_10to50) {
-      if(!isTausample) {
-        if(theYear == 2016) wStitch = 19.0080307;
-        else if(theYear == 2017) wStitch = 19.5191962215717;
-        else if(theYear == 2018) wStitch = 28.2040833505999;
-      }
-      else wStitch = -9999;
-    }
-    else {
-      if(isTausample) {
-        if(Npartons == 0 || Npartons >= 5) {
-          if(mvis < 150) {
-            if(theYear == 2016) wStitch = 1.49005321266736;
-	    else if(theYear == 2017) wStitch = ;
-            else if(theYear == 2018) wStitch = 28.2040833505999;*/
-  return 1.;
-}
+

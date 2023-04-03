@@ -391,6 +391,7 @@ private:
   std::vector<int>  PFTau_Track_pdgid;
   std::vector<double>  PFTau_Track_B;
   std::vector<double>  PFTau_Track_M;
+  std::vector<TrackParticle> TauTrack;
 
   std::vector<int> a1_charge;
   std::vector<int> a1_pdgid;
@@ -2283,6 +2284,7 @@ void HTauTauNtuplizer::Initialize(){
   PFTau_Track_pdgid.clear();
   PFTau_Track_B.clear();
   PFTau_Track_M.clear();
+  TauTrack.clear();
   PFTauLeadTrackLV.clear();
   PFTauTrack_deltaR.clear();
   TauFLSignificance.clear();
@@ -2864,7 +2866,7 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
   if(theisMC || IsEmbed){
     edm::Handle<GenEventInfoProduct> hgenEvt;
     event.getByToken(theGenTag,hgenEvt);
-    hMCweightCounter->SetBinContent(1,hgenEvt->weight());
+    hMCweightCounter->Fill(0.5,hgenEvt->weight());
   }
 
   // protect in case of events where trigger hasn't fired --> no collection created
@@ -2981,7 +2983,7 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
   _puppimet_ey_JetResDown = (*PUPPImetHandle)[0].shiftedPy(pat::MET::METUncertainty::JetResDown,pat::MET::METCorrectionLevel::Type1);
 
   _passecalBadCalibFilterUpdate =  (*passecalBadCalibFilterUpdate );
-  if (theisMC && (theYear==2016 || theYear==2017) && !IsEmbed)
+  if(theisMC && (theYear==2016 || theYear==2017) && !IsEmbed)
     {
       _prefiringweight = (*theprefweight);
       _prefiringweightup =(*theprefweightup);
@@ -3178,14 +3180,11 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
   else if(theYear==2018){
     //single
     MatchedTriggerNames.push_back("HLT_IsoMu24_v");
+    MatchedTriggerNames.push_back("HLT_IsoMu24_eta2p1_v");
     MatchedTriggerNames.push_back("HLT_IsoMu27_v");
     //cross
-    if(theisMC || (!theisMC && _runNumber>317509) || IsEmbed) MatchedTriggerNames.push_back("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v");
-    else MatchedTriggerNames.push_back("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v");
-    //if(!theisMC){
-    //if(315974<=_runNumber<=317509 || IsEmbed) MatchedTriggerNames.push_back("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v");
-    //if(_runNumber>317509 || IsEmbed) MatchedTriggerNames.push_back("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v");
-    //}
+    if(!theisMC && !IsEmbed && _runNumber<=317509) MatchedTriggerNames.push_back("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTau27_eta2p1_CrossL1_v");
+    else MatchedTriggerNames.push_back("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v");
   }
 
   std::vector<int> out;
@@ -3251,10 +3250,11 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
 
   mySysHelper->GetCollections(cands, daus, Smearedjets, SmearedjetsUp, SmearedjetsDown);
   mySysHelper->GetEventInfo(IsEmbed, theisMC, _runNumber, _npu, _indexevents, _lumi);
-  mySysHelper->GetDecayProducts(A1LVP, MuonTrack, _PFTauRefitPionsP4, _PFTauRefitPionsCharge);
+  mySysHelper->GetDecayProducts(A1LVP, MuonTrack, TauTrack, _PFTauRefitPionsP4, _PFTauRefitPionsCharge);
   mySysHelper->GetPV(_RefitPVBS_x, _RefitPVBS_y, _RefitPVBS_z, _RefitPVBS_Cov, _VertexHashBS1, _VertexHashBS2, _LeptonHash);
   mySysHelper->GetMETCov(_PUPPIMETCov00, _PUPPIMETCov10, _PUPPIMETCov11);
   mySysHelper->GetJECUnc(_SourceUncValRegrouped_up, _SourceUncValRegrouped_dw, &jecSourceUncRegroupedProviders, &jecUnc);
+  mySysHelper->GetPrefiringWeights(_prefiringweight, _prefiringweightup, _prefiringweightdown);
   /////
   if(!(theisMC || IsEmbed)) {
     mySysHelper->ResetVariables();
@@ -3870,9 +3870,23 @@ void HTauTauNtuplizer::FillSoftLeptons(const edm::View<reco::Candidate> *daus,
     PFTau_Track_B.push_back(iPFTau_Track_B);
     PFTau_Track_pdgid.push_back(iPFTau_Track_pdgid);
     PFTau_Track_charge.push_back(iPFTau_Track_trackCharge);
-
     PFTau_Track_cov.push_back(iPFTau_Track_cov);
     PFTau_Track_par.push_back(iPFTau_Track_par);
+
+    if(iPFTau_Track_par.size() != 0) {
+      TMatrixT<double>    tau_par(TrackParticle::NHelixPar,1);
+      TMatrixTSym<double> tau_cov(TrackParticle::NHelixPar);
+      int ltau=0;
+      for(int k=0; k<TrackParticle::NHelixPar; k++){
+        tau_par(k,0)=iPFTau_Track_par.at(k);
+        for(int j=k; j<TrackParticle::NHelixPar; j++){
+          tau_cov(k,j)=iPFTau_Track_cov.at(ltau);
+          ltau++;
+        }
+      }
+      TauTrack.push_back(TrackParticle(tau_par,tau_cov,iPFTau_Track_pdgid,iPFTau_Track_M,iPFTau_Track_trackCharge,iPFTau_Track_B));
+    }
+    else TauTrack.push_back(TrackParticle());
 
 
     _dxy_innerTrack.push_back(dxy_innerTrack);
@@ -4606,7 +4620,7 @@ void HTauTauNtuplizer::endJob(){
 void HTauTauNtuplizer::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup){
 
   // For 2018 data (run < 315974) the muon filters of the MuTau triggers (leg1) need to be customized
-  if (!theisMC && theYear==2018 && iRun.run()<315974)
+  if (!theisMC && !IsEmbed && theYear==2018 && iRun.run()<315974)
     {
       // HLT paths with "HPS"
       if ( myTriggerHelper->HasTriggerMap("HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v") )
