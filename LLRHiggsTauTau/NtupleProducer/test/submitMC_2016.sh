@@ -74,10 +74,10 @@ crab submit config2016/ZZ/crab3_ZZ_2l2q_2016.py
 ##VV
 
 sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("VV_2l2nu")/g' ../python/HiggsTauTauProducer.py
-crab submit config2016/EWK/crab3_VV_2l2nu_v1_2016.py
+crab submit config2016/VV/crab3_VV_2l2nu_v1_2016.py
 
 sed -i 's/.*DataMCType.*/                                      DataMCType    = cms.untracked.string("VV_2l2nu")/g' ../python/HiggsTauTauProducer.py
-crab submit config2016/EWK/crab3_VV_2l2nu_v2_2016.py
+crab submit config2016/VV/crab3_VV_2l2nu_v2_2016.py
 
 #########
 ##WW
