@@ -21,8 +21,6 @@ HLTLIST = cms.VPSet(
         path4 = cms.vstring (""),
         leg1 = cms.int32(13),
         leg2 = cms.int32(999),
-        pt1 = cms.double(29),
-        pt2 = cms.double(-999)
         ),
     cms.PSet (
         HLT = cms.string("HLT_IsoMu24_v"), # ---------- it's prescaled: TO BE REMOVED
@@ -32,8 +30,6 @@ HLTLIST = cms.VPSet(
         path4 = cms.vstring (""),
         leg1 = cms.int32(13),
         leg2 = cms.int32(999),
-        pt1 = cms.double(26),
-        pt2 = cms.double(-999)
         ),
 ### === Single electron triggers - OK
     cms.PSet (
@@ -67,8 +63,6 @@ HLTLIST = cms.VPSet(
         path4 = cms.vstring (""),
         leg1 = cms.int32(13),
         leg2 = cms.int32(15),
-        pt1 = cms.double(22),
-        pt2 = cms.double(32)
         ),
     cms.PSet (
         HLT = cms.string("HLT_IsoMu20_eta2p1_MediumChargedIsoPFTau27_eta2p1_CrossL1_v"),

@@ -1,5 +1,8 @@
-#!/bin/bash
+#!/usr/bin/bash
 
-sed -i "s#.*outLFNDirBase.*#config.Data.outLFNDirBase= "\'"/store/user${1}"\'"#g" config2018/*/*.py
+sed -i "s#.*outLFNDirBase.*#config.Data.outLFNDirBase= "\'"/store/user${1}"\'"#g" config${2}/*/*.py
+
+
+
 
 

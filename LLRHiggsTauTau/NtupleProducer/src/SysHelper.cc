@@ -232,7 +232,7 @@ SysHelper::SysHelper(Int_t theYear, std::string dataMCstring)
   }
   if(theYear == 2017) {
     TFile* filePUdistribution_data=TFile::Open("$CMSSW_BASE/data/pileup/pu_distributions_data_2017.root", "READ");
-    TFile* filePUdistribution_MC = nullptr;
+    TFile* filePUdistribution_MC = new TFile();
     if(_Idstr=="dy_ll") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_DYJetsToLL-LO.root", "READ");
     else if(_Idstr=="w_3qlnu") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_W3JetsToLNu-LO.root", "READ");
     else if(_Idstr=="ww_1l1nu2q") filePUdistribution_MC=TFile::Open("$CMSSW_BASE/data/pileup/pileup_2017_WWTo1L1Nu2Q.root", "READ");
@@ -424,7 +424,7 @@ void SysHelper::FillGenTaus(std::vector<std::vector<unsigned int>> signal_Tauidx
       _genPVx = tauandprod_vtx.at(signal_Tauidx.at(i).at(muIdx)).at(0).at(0);
       _genPVy = tauandprod_vtx.at(signal_Tauidx.at(i).at(muIdx)).at(0).at(1);
       _genPVz = tauandprod_vtx.at(signal_Tauidx.at(i).at(muIdx)).at(0).at(2);
-      //Fill gen tau vis
+      //Fill gen tau 
       _genTaupx = tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(0).at(1);
       _genTaupy = tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(0).at(2);
       _genTaupz = tauandprod_p4.at(signal_Tauidx.at(i).at(tauIdx)).at(0).at(3);
@@ -532,7 +532,8 @@ bool SysHelper::FillPV(int tauIndex, int muonIndex) {
 	  pvcov = _RefitPVBS_Cov.at(ivertex);
 	}
       } // loop over refitted vertices collection
-      return true;
+      if(_pvx == -99 && _pvy == -99 && _pvz == -99) return false;
+      else return true;
     }
   else return false;
 }
@@ -746,7 +747,6 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
   //
   const reco::Candidate *tau = SelectedPair.daughter(1);
   const reco::Candidate *mu = SelectedPair.daughter(0);
-
   // Tau and Mu ES are corrected from here
   _tauDM = userdatahelpers::getUserFloat(tau,"MVADM2017v1");
   if(_tauDM<0) return;
@@ -819,7 +819,6 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
   if(_muMETmt>50) return;
   _PUPPImet = std::sqrt(std::pow(ShiftedPUPPImet_px,2) + std::pow(ShiftedPUPPImet_py,2));
   _PUPPImetphi = (TVector3(ShiftedPUPPImet_px,ShiftedPUPPImet_py,0.)).Phi();
-
   // Compute FastMTT ditau mass here
   TMatrixD PUPPImetCovMatrix(2,2);
   PUPPImetCovMatrix[0][0] = _PUPPIMETCov00;
@@ -841,7 +840,6 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
   classic_svFit::LorentzVector tau2P4mtt = FastMTTAlgo.getTau2P4();
   //
   _fastMTTmass = (tau1P4mtt + tau2P4mtt).mass();
-   
   // Compute PhiCP here for a1mu channel
   if(_tauDM == 10 && RefitPionsP4.size()==3 && A1LVP.at(_tauIndex).LV().P()!=0 && pvcov.size()!=0) {
     _pvCov00 = pvcov[0][0];
@@ -877,18 +875,16 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
     _tauSVy = A1LVP.at(_tauIndex).Vertex().Y();
     _tauSVz = A1LVP.at(_tauIndex).Vertex().Z();
   }  
-
   //Calculate tau IP and its significance, needed for Fake Factors in DM0 bin
   if(_tauDM == 0 && TauTrack.at(_tauIndex).Mass() != 0) {
+
     TrackParticle tauTrack = TauTrack.at(_tauIndex);
     LorentzVectorParticle tauLVP(tauTrack.getParMatrix(), tauTrack.getCovMatrix(), tauTrack.PDGID(), tauTrack.Charge(), tauTrack.BField());
-
     std::vector<float> h_param = {float(tauTrack.Parameter(TrackParticle::kappa)),
 				  float(tauTrack.Parameter(TrackParticle::lambda)),
 				  float(tauTrack.Parameter(TrackParticle::phi)),
 				  float(tauTrack.Parameter(TrackParticle::dxy)),
 				  float(tauTrack.Parameter(TrackParticle::dz))};
-
     ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float> > ref(tauLVP.Parameter(0),tauLVP.Parameter(1),tauLVP.Parameter(2));
     ROOT::Math::PositionVector3D<ROOT::Math::Cartesian3D<float> > pvtx(PV.X(),PV.Y(),PV.Z());
 
@@ -897,7 +893,6 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
     _tauIPx = ip.x();
     _tauIPy = ip.y();
     _tauIPz = ip.z();
-
     ROOT::Math::SMatrix<double,5,5, ROOT::Math::MatRepSym<double,5>> helixCov;
     TMatrixTSym<double> cov = tauLVP.getCovMatrix();
     SMatrixSym3D SigmaPrV;
@@ -920,7 +915,7 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
     double uncert = sqrt(ROOT::Math::Dot( ip_svec, ip_cov * ip_svec));
     _tauIPsignificance = mag/uncert;
   }
- 
+
   // Various Weights
   if(_isMC  || _isEmbed) {
     _TauIDSFmap = weight::TauIDSF(_tauGenMatch, _tauDM, tau->p4(), _isEmbed, sysType, _w, _Label);
@@ -987,6 +982,7 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
     }
     _wTot*=_wIDvsJet*_wIDvsMu*_wIDvsEle*_wIDMu*_wTrkMu*_wTrg*_wMC*_wPU*_wZpT*_wToppT*_wSignal*_wBtag*_wPrefiring*_wEmb;
   }
+
   tree->Fill();
 }
 
@@ -1271,7 +1267,7 @@ bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Even
         else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),4) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),4) && MuonP4.pt()>21 && TauP4.pt()>32 && std::abs(TauP4.eta())<2.1) _trgXMuTau = true;
         else continue;
       }
-      if(trig && _theYear == 2018){
+      else if(trig && _theYear == 2018){
 	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2) && MuonP4.pt()>25) {_trgIsoMu = true; isomu27 = true;}
         else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),1) && MuonP4.pt()>25) {_trgIsoMu = true; isomu24_2p1 = true;}
         else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),0) && MuonP4.pt()>25) {_trgIsoMu = true; isomu24 = true;}
