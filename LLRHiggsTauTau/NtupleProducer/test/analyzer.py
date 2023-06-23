@@ -7,7 +7,7 @@ import os, re
 PyFilePath = os.environ['CMSSW_BASE']+"/src/LLRHiggsTauTau/NtupleProducer/"
 
 # Year/Period
-YEAR   = 2017
+YEAR   = 2018
 PERIOD = ' '
 
 #samples list (it could be moved to a cfg file for better reading
@@ -37,8 +37,8 @@ COMPUTEUPDOWNSVFIT=False # compute SVfit for up/down TES variation
 COMPUTEMETUPDOWNSVFIT=False # compute SVfit for up/down MET JES variation
 doCPVariables=False # compute CP variables and PV refit
 COMPUTEQGVAR = False # compute QG Tagger for jets
-IsMC=True
-IsEmbed=False
+IsMC=False
+IsEmbed=True
 Is25ns=True
 HLTProcessName='HLT' #Different names possible, check e.g. at https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD.
 if not IsMC:
@@ -103,7 +103,8 @@ process.source = cms.Source("PoolSource",
     #'/store/data/Run2017D/SingleMuon/MINIAOD/31Mar2018-v1/00000/EAD9CACD-DE39-E811-9EB3-0CC47A4DEDF0.root'
     #'/store/data/Run2017F/SingleMuon/MINIAOD/31Mar2018-v1/30000/2CE4BE78-B437-E811-98D9-0CC47ADAF3DA.root'
     #'/store/mc/RunIISummer16MiniAODv3/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCUETP8M1_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/230000/0840E6D0-C814-EA11-ABCD-AC1F6BAC7C0A.root'
-    '/store/mc/RunIIFall17MiniAODv2/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/270000/02B28A60-BF14-EA11-BB88-008CFA197464.root'
+    #'/store/mc/RunIIFall17MiniAODv2/GluGluHToTauTauUncorrelatedDecay_Filtered_M125_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/270000/02B28A60-BF14-EA11-BB88-008CFA197464.root'
+    '/store/user/aakhmets/gc_storage/MuTau_data_2017_CMSSW944_gridka/TauEmbedding_MuTau_data_2017_CMSSW944_Run2017D/12/merged_4411.root'
     ),
 )
 
@@ -111,7 +112,7 @@ process.source = cms.Source("PoolSource",
 # process.source.eventsToProcess = cms.untracked.VEventRange("1:4006-1:4006") # run only on event=2347130 (syntax= from run:evt - to run:evt)
 
 #Limited nEv for testing purposes. -1 to run all events
-process.maxEvents.input = -1
+process.maxEvents.input = 1000
 
 # JSON mask for data --> defined in the lumiMask file
 # from JSON file

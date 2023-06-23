@@ -86,12 +86,23 @@ SysHelper::SysHelper(Int_t theYear, std::string dataMCstring)
   _PUPPIMETCov00 = -99;
   _PUPPIMETCov10 = -99;
   _PUPPIMETCov11 = -99;
+  _METunc_pxUp = -99;
+  _METunc_pyUp = -99;
+  _METunc_pxDown = -99;
+  _METunc_pyDown = -99;
   _pvPhiCP = -99;
   _dpPhiCP = -99;
   //Triggers
   _trgIsoMu = false;
-  _extraIsoMu = false;
   _trgXMuTau = false;
+  _isomu22 = false;
+  _isomu22_2p1 = false;
+  _isotkmu22 = false;
+  _isotkmu22_2p1 = false;
+  _isomu24 = false;
+  _isomu24_2p1 = false;
+  _isomu27 = false;
+  _trgMatch = false;
   //Weights
   _wEven = 1.;
   _wOdd = 1.;
@@ -337,8 +348,15 @@ void SysHelper::ResetVariables()
   _dpPhiCP = -99;
   //Triggers
   _trgIsoMu = false;
-  _extraIsoMu = false;
   _trgXMuTau = false;
+  _isomu22 = false;
+  _isomu22_2p1 = false;
+  _isotkmu22 = false;
+  _isotkmu22_2p1 = false;
+  _isomu24 = false;
+  _isomu24_2p1 = false;
+  _isomu27 = false;
+  _trgMatch = false;
   //Weights
   _wPrefiring = 1.;
   _wPrefiringUp = 1.;
@@ -545,6 +563,14 @@ void SysHelper::GetMETCov(float cov00, float cov10, float cov11) {
   _PUPPIMETCov11 = cov11;
 }
 
+void SysHelper::GetMETUnclustered(float METunc_pxUp, float METunc_pyUp, float METunc_pxDown, float METunc_pyDown) {
+  _METunc_pxUp = METunc_pxUp;
+  _METunc_pyUp = METunc_pyUp;
+  _METunc_pxDown = METunc_pxDown;
+  _METunc_pyDown = METunc_pyDown;
+}
+
+
 void SysHelper::GetJECUnc(std::map<std::string, std::vector<Float_t>> JECmapUp_, std::map<std::string, std::vector<Float_t>> JECmapDown_, myJECMap* JECmap_, JetCorrectionUncertainty* JECunc_) {
 
   JECmapUp = JECmapUp_;
@@ -646,8 +672,15 @@ void SysHelper::MakeBranches(TTree *tree, bool isNominal) {
   tree->Branch("pvPhiCP", &_pvPhiCP);
   tree->Branch("dpPhiCP", &_dpPhiCP);
   tree->Branch("trgIsoMu", &_trgIsoMu);
-  tree->Branch("extraIsoMu", &_extraIsoMu);
   tree->Branch("trgXMuTau", &_trgXMuTau);
+  tree->Branch("isomu22", &_isomu22);
+  tree->Branch("isotkmu22", &_isotkmu22);
+  tree->Branch("isomu22_2p1", &_isomu22_2p1);
+  tree->Branch("isotkmu22_2p1", &_isotkmu22_2p1);
+  tree->Branch("isomu24", &_isomu24);
+  tree->Branch("isomu24_2p1", &_isomu24_2p1);
+  tree->Branch("isomu27", &_isomu27);
+  tree->Branch("trgMatch", &_trgMatch);
   tree->Branch("MCId", &_Id);
   tree->Branch("Npartons", &_Npartons);
   tree->Branch("nPU", &_nPU);
@@ -812,6 +845,16 @@ void SysHelper::FillTree(TTree *tree, std::string sysType, std::string var, cons
   }
   if(_isMC && (_isSignal || _isW || _isZ)){
     corrector::METRecoilCorrection(event, generictag, PUPPImet, _Njets, ShiftedPUPPImet_px, ShiftedPUPPImet_py, sysType, var, _recoilPuppiMetCorrector, _recoilPuppiMetShifter);
+  }
+  if(_isMC && sysType == "METUnclustered") {
+    if(var == "Up") {
+      ShiftedPUPPImet_px = _METunc_pxUp;
+      ShiftedPUPPImet_py = _METunc_pyUp;
+    }
+    if(var == "Down") {
+      ShiftedPUPPImet_px = _METunc_pxDown;
+      ShiftedPUPPImet_py = _METunc_pyDown;
+    }
   }
   // MET is corrected from here
   _ditauPt = std::sqrt(std::pow((tau->px() + mu->px() + ShiftedPUPPImet_px),2) + std::pow((tau->py() + mu->py() + ShiftedPUPPImet_py),2));
@@ -1190,8 +1233,8 @@ bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Even
         cand.daughter(1)->setP4(TauP4);
       }
       else if(_isEmbed){
-        if(sysType == "TES") TauP4 = corrector::embTauP4Corrected(cand.daughter(1)->p4(),genMatch,decayMode, var);
-        else TauP4 = corrector::embTauP4Corrected(cand.daughter(1)->p4(),genMatch,decayMode, "Nom");
+        if(sysType == "TES") TauP4 = corrector::embTauP4Corrected(_theYear,cand.daughter(1)->p4(),genMatch,decayMode, var);
+        else TauP4 = corrector::embTauP4Corrected(_theYear,cand.daughter(1)->p4(),genMatch,decayMode, "Nom");
         cand.daughter(1)->setP4(TauP4);
       }
       else TauP4 = cand.daughter(1)->p4();
@@ -1231,7 +1274,7 @@ bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Even
     //dxy
     if(std::abs(userdatahelpers::getUserFloat(cand.daughter(0),"dxy")) > 0.045) continue;
     //decay mode
-    if(decayModeFindingNewDMs<0.5 || decayModeFindingNewDMs == 5 || decayModeFindingNewDMs == 6) continue;
+    if(decayModeFindingNewDMs<0.5 || decayMode == 5 || decayMode == 6) continue;
     //ID
     if(byVVVLooseDeepTau2017v2p1VSjet<0.5 || byVVLooseDeepTau2017v2p1VSe<0.5 || byTightDeepTau2017v2p1VSmu<0.5) continue;
     if(byVVVLooseDeepTau2017v2p1VSjet>0.5 && byMediumDeepTau2017v2p1VSjet>0.5) _isMediumID = true;
@@ -1247,39 +1290,56 @@ bool SysHelper::SelectPair(std::string sysType, std::string var, const edm::Even
     //visible mass
     if((TauP4+MuonP4).M()<40) continue;
     //
-    bool isomu27 = false;
-    bool isomu24_2p1 = false;
-    bool isomu24 = false;
     if(tauIndex!=-99 && muonIndex!=-99) {
-      if(_isEmbed) trig = true;
+      if(_isEmbed) {
+	_trgMatch = trig;
+	trig = true;
+      }
       if(trig && _theYear == 2016){
-        if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1) _trgIsoMu = true;
-	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),3) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1) _trgIsoMu = true;
-	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),4) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1) _trgIsoMu = true;
-	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),6) && MuonP4.pt()>23 && std::abs(MuonP4.eta())<2.1) _trgIsoMu = true;
-	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),19) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),19)) _trgXMuTau = true;
-        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),20) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),20)) _trgXMuTau = true;
-	else continue;
+        if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2) 
+	  && seltools::OfflineTrgCut("singleMu",22,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isomu22 = true;}
+	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),3)
+	  && seltools::OfflineTrgCut("singleMu",22,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isotkmu22 = true;}
+	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),4)
+	  && seltools::OfflineTrgCut("singleMu",22,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isomu22_2p1 = true;}
+	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),6)
+	  && seltools::OfflineTrgCut("singleMu",22,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isotkmu22_2p1 = true;}
+        //
+	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),19) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),19)
+	  && seltools::OfflineTrgCut("crossMuTau",19,20,cand.daughter(0),cand.daughter(1))) _trgXMuTau = true;
+        if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),20) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),20)
+	  && seltools::OfflineTrgCut("crossMuTau",19,20,cand.daughter(0),cand.daughter(1))) _trgXMuTau = true;
       }
       else if(trig && _theYear == 2017){
-	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),0) && MuonP4.pt()>25) _trgIsoMu = true;
-        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),1) && MuonP4.pt()>25) _trgIsoMu = true;
-        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),4) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),4) && MuonP4.pt()>21 && TauP4.pt()>32 && std::abs(TauP4.eta())<2.1) _trgXMuTau = true;
-        else continue;
+	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),0)
+	  && seltools::OfflineTrgCut("singleMu",27,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isomu27 = true;}
+        if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),1)
+	  && seltools::OfflineTrgCut("singleMu",24,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isomu24_2p1 = true;}
+        if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2)
+	  && seltools::OfflineTrgCut("singleMu",24,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isomu24 = true;}
+	//
+        if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),5) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),5)
+	  && seltools::OfflineTrgCut("crossMuTau",20,27,cand.daughter(0),cand.daughter(1))) _trgXMuTau = true;
       }
       else if(trig && _theYear == 2018){
-	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2) && MuonP4.pt()>25) {_trgIsoMu = true; isomu27 = true;}
-        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),1) && MuonP4.pt()>25) {_trgIsoMu = true; isomu24_2p1 = true;}
-        else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),0) && MuonP4.pt()>25) {_trgIsoMu = true; isomu24 = true;}
+	if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),2)
+	  && seltools::OfflineTrgCut("singleMu",27,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isomu27 = true;}
+        if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),1)
+	  && seltools::OfflineTrgCut("singleMu",24,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isomu24_2p1 = true;}
+        if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),0)
+	  && seltools::OfflineTrgCut("singleMu",24,-99,cand.daughter(0),cand.daughter(1))) {_trgIsoMu = true; _isomu24 = true;}
         //
-        else if(_isData && _runNumber<=317509) {
-	  if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),13) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),13) && MuonP4.pt()>21 && std::abs(MuonP4.eta())<2.1 && TauP4.pt()>32 && std::abs(TauP4.eta())<2.1) _trgXMuTau = true;
+        if(_isData && _runNumber<=317509) {
+	  if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),13) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),13)
+	    && seltools::OfflineTrgCut("crossMuTau",20,27,cand.daughter(0),cand.daughter(1))) _trgXMuTau = true;
         }
-	else if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),7) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),7) && MuonP4.pt()>21 && std::abs(MuonP4.eta())<2.1 && TauP4.pt()>32 && std::abs(TauP4.eta())<2.1) _trgXMuTau = true;
+	else{
+	  if(seltools::CHECK_BIT(_daughters_trgMatched.at(muonIndex),7) && seltools::CHECK_BIT(_daughters_trgMatched.at(tauIndex),7)
+	    && seltools::OfflineTrgCut("crossMuTau",20,27,cand.daughter(0),cand.daughter(1))) _trgXMuTau = true;
+        }
       }
       else continue;
     }
-    if(!isomu24 && !isomu27 && isomu24_2p1) _extraIsoMu = true;
     if(!(_trgIsoMu || _trgXMuTau)) continue;
     candVector.push_back(cand);
     Npairs++;

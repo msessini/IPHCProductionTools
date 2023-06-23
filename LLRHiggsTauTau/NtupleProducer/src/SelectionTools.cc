@@ -174,5 +174,39 @@ float seltools::ComputeMT (math::XYZTLorentzVector visP4, float METx, float METy
   return sqrt(2.*visP4.Pt()*METP4.Pt()*(1.-cos(dphi)));
 }
 
+bool seltools::OfflineTrgCut(std::string type, int muOnline, int tauOnline, const reco::Candidate* mu, const reco::Candidate* tau)
+{
+  float muPtCut;
+  float muEtaCut; 
+  float tauPtCut;
+  float tauEtaCut;
+
+  if(type == "singleMu") {
+    muEtaCut = 2.1;
+    tauPtCut = 20.;
+    tauEtaCut = 2.3;
+    if(muOnline == 22) muPtCut = 23.;
+    else if(muOnline == 24 || muOnline == 27) muPtCut = 25.;
+    else return false;
+  }
+  else if(type == "crossMuTau") {
+    muEtaCut = 2.1;
+    tauEtaCut = 2.1;
+    if(muOnline == 19 && tauOnline == 20) {
+      muPtCut = 20.;
+      tauPtCut = 25.;
+    }
+    else if(muOnline == 20 && tauOnline == 27) {
+      muPtCut = 21.;
+      tauPtCut = 32.;
+    }
+    else return false;
+  }
+  else return false;
+  //   
+  if(mu->pt() > muPtCut && std::abs(mu->eta()) < muEtaCut && tau->pt() > tauPtCut && std::abs(tau->eta()) < tauEtaCut) return true;
+  else return false;
+}
+
 
 

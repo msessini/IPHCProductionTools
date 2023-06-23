@@ -24,7 +24,7 @@ namespace corrector{
   void IPCorrection(const edm::Event& event, edm::EDGetTokenT<edm::View<pat::GenericParticle>> generictag, TVector3 IP, double Eta, IpCorrection ipCorrector);
   void METRecoilCorrection(const edm::Event& event, edm::EDGetTokenT<edm::View<pat::GenericParticle>> generictag, const pat::MET& PUPPImet, int Njets, float shiftedMETx, float shiftedMETy, std::string sysType, std::string var, RecoilCorrector* recoilPuppiMetCorrector, MEtSys* recoilPuppiMetShifter);
   math::XYZTLorentzVector TauP4Corrected(math::XYZTLorentzVector p4, int genmatch, int DM, std::string Unc, TH1* histTES, TGraph* histFES);
-  math::XYZTLorentzVector embTauP4Corrected(math::XYZTLorentzVector p4, int genmatch, int DM, std::string Unc);
+  math::XYZTLorentzVector embTauP4Corrected(int theYear, math::XYZTLorentzVector p4, int genmatch, int DM, std::string Unc);
   math::XYZTLorentzVector MuP4Corrected(math::XYZTLorentzVector p4, std::string Unc);
 };
 

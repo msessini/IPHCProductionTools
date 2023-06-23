@@ -1484,6 +1484,8 @@ private:
   TTree *METResoDown;
   TTree *METScaleUp;
   TTree *METScaleDown;
+  TTree *METUnclusteredUp;
+  TTree *METUnclusteredDown;
   TTree *FlavorQCDUp;
   TTree *FlavorQCDDown;
   TTree *RelativeBalUp;
@@ -1519,6 +1521,8 @@ private:
     {"METResoDown",  METResoDown}, 
     {"METScaleUp",  METScaleUp}, 
     {"METScaleDown",  METScaleDown}, 
+    {"METUnclusteredUp", METUnclusteredUp},
+    {"METUnclusteredDown", METUnclusteredDown},
     {"FlavorQCDUp",  FlavorQCDUp}, 
     {"FlavorQCDDown",  FlavorQCDDown}, 
     {"RelativeBalUp",  RelativeBalUp}, 
@@ -3253,6 +3257,7 @@ void HTauTauNtuplizer::analyze(const edm::Event& event, const edm::EventSetup& e
   mySysHelper->GetDecayProducts(A1LVP, MuonTrack, TauTrack, _PFTauRefitPionsP4, _PFTauRefitPionsCharge);
   mySysHelper->GetPV(_RefitPVBS_x, _RefitPVBS_y, _RefitPVBS_z, _RefitPVBS_Cov, _VertexHashBS1, _VertexHashBS2, _LeptonHash);
   mySysHelper->GetMETCov(_PUPPIMETCov00, _PUPPIMETCov10, _PUPPIMETCov11);
+  mySysHelper->GetMETUnclustered(_puppimet_ex_UnclusteredEnUp,_puppimet_ey_UnclusteredEnUp,_puppimet_ex_UnclusteredEnDown,_puppimet_ey_UnclusteredEnDown);
   mySysHelper->GetJECUnc(_SourceUncValRegrouped_up, _SourceUncValRegrouped_dw, &jecSourceUncRegroupedProviders, &jecUnc);
   mySysHelper->GetPrefiringWeights(_prefiringweight, _prefiringweightup, _prefiringweightdown);
   /////

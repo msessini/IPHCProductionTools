@@ -189,8 +189,8 @@ HLTLIST = cms.VPSet(
         ), ### ok
     cms.PSet (
         HLT = cms.string("HLT_IsoMu19_eta2p1_LooseIsoPFTau20_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sMu18erTauJet20erL1f0L2f10QL3f19QL3trkIsoFiltered0p09", "hltOverlapFilterIsoMu19LooseIsoPFTau20"),
-        path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", "hltOverlapFilterIsoMu19LooseIsoPFTau20"),
+        path1 = cms.vstring ("hltL3crIsoL1sMu18erTauJet20erL1f0L2f10QL3f19QL3trkIsoFiltered0p09", ""),
+        path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", ""),
         path3 = cms.vstring (""),
         path4 = cms.vstring (""),
         leg1 = cms.int32(13),
@@ -198,8 +198,8 @@ HLTLIST = cms.VPSet(
         ), ### ok
     cms.PSet (
         HLT = cms.string("HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v"),
-        path1 = cms.vstring ("hltL3crIsoL1sSingleMu18erIorSingleMu20erL1f0L2f10QL3f19QL3trkIsoFiltered0p09", "hltOverlapFilterSingleIsoMu19LooseIsoPFTau20"),
-        path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", "hltOverlapFilterSingleIsoMu19LooseIsoPFTau20"),
+        path1 = cms.vstring ("hltL3crIsoL1sSingleMu18erIorSingleMu20erL1f0L2f10QL3f19QL3trkIsoFiltered0p09", ""),
+        path2 = cms.vstring ("hltPFTau20TrackLooseIsoAgainstMuon", ""),
         path3 = cms.vstring (""),
         path4 = cms.vstring (""),
         leg1 = cms.int32(13),

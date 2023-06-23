@@ -212,7 +212,7 @@ math::XYZTLorentzVector corrector::TauP4Corrected(math::XYZTLorentzVector p4, in
   return math::XYZTLorentzVector(px_scaled, py_scaled, pz_scaled, en_scaled);
 }
 
-math::XYZTLorentzVector corrector::embTauP4Corrected(math::XYZTLorentzVector p4, int genmatch, int DM, std::string Unc){
+math::XYZTLorentzVector corrector::embTauP4Corrected(int theYear, math::XYZTLorentzVector p4, int genmatch, int DM, std::string Unc){
 
   double scale = 0.;
   double px_scaled = p4.Px();
@@ -221,34 +221,100 @@ math::XYZTLorentzVector corrector::embTauP4Corrected(math::XYZTLorentzVector p4,
   double m_scaled = p4.M();
   double E_scaled = p4.energy();
   //
-  if(genmatch == 5) {
-    if(DM==0) { // 1 prong
-      scale = -0.0033;
-      if(Unc=="Up") scale += 0.0039;
-      if(Unc=="Down") scale -= 0.0039;
+  if(theYear == 2016) {
+    if(genmatch == 5) {
+      if(DM==0) { // 1 prong
+	scale = -0.0020;
+	if(Unc=="Up") scale += 0.0046;
+	if(Unc=="Down") scale -= 0.0046;
+      }
+      if(DM==1) { // 1 prong + pi0
+	scale = -0.0022;
+	if(Unc=="Up") scale += 0.0022;
+	if(Unc=="Down") scale -= 0.0025;
+      }
+      if(DM==10 || DM==11) { // 3 prong
+	scale = -0.0126;
+	if(Unc=="Up") scale += 0.0033;
+	if(Unc=="Down") scale -= 0.0051;
+      }
     }
-    if(DM==1) { // 1 prong + pi0
-      scale = -0.0057;
-      if(Unc=="Up") scale += 0.0037;
-      if(Unc=="Down") scale -= 0.0031;
-    }
-    if(DM==10 || DM==11) { // 3 prong
-      scale = -0.0074;
-      if(Unc=="Up") scale += 0.0032;
-      if(Unc=="Down") scale -= 0.0032;
+    //
+    if(genmatch == 1 || genmatch == 3) {
+      if(std::abs(p4.eta()) < 1.479) { // barrel electrons
+	scale = -0.0024;
+	if(Unc=="Up") scale += 0.0050;
+	if(Unc=="Down") scale -= 0.0050;
+      }
+      if(std::abs(p4.eta()) > 1.479) { // endcap electrons
+	scale = -0.0070;
+	if(Unc=="Up") scale += 0.0125;
+	if(Unc=="Down") scale -= 0.0125;
+      }
     }
   }
-  //
-  if(genmatch == 1 || genmatch == 3) {
-    if(std::abs(p4.eta()) < 1.479) { // barrel electrons
-      scale = -0.0033;
-      if(Unc=="Up") scale += 0.0050;
-      if(Unc=="Down") scale -= 0.0050;
+  if(theYear == 2017) {
+    if(genmatch == 5) {
+      if(DM==0) { // 1 prong
+	scale = -0.0004;
+	if(Unc=="Up") scale += 0.0041;
+	if(Unc=="Down") scale -= 0.0042;
+      }
+      if(DM==1) { // 1 prong + pi0
+	scale = -0.0120;
+	if(Unc=="Up") scale += 0.0052;
+	if(Unc=="Down") scale -= 0.0021;
+      }
+      if(DM==10 || DM==11) { // 3 prong
+	scale = -0.0075;
+	if(Unc=="Up") scale += 0.0044;
+	if(Unc=="Down") scale -= 0.0046;
+      }
     }
-    if(std::abs(p4.eta()) > 1.479) { // endcap electrons
-      scale = -0.0056;
-      if(Unc=="Up") scale += 0.0125;
-      if(Unc=="Down") scale -= 0.0125;
+    //
+    if(genmatch == 1 || genmatch == 3) {
+      if(std::abs(p4.eta()) < 1.479) { // barrel electrons
+	scale = -0.0007;
+	if(Unc=="Up") scale += 0.0050;
+	if(Unc=="Down") scale -= 0.0050;
+      }
+      if(std::abs(p4.eta()) > 1.479) { // endcap electrons
+	scale = -0.0113;
+	if(Unc=="Up") scale += 0.0125;
+	if(Unc=="Down") scale -= 0.0125;
+      }
+    }
+  }
+  if(theYear == 2018) {
+    if(genmatch == 5) {
+      if(DM==0) { // 1 prong
+	scale = -0.0033;
+	if(Unc=="Up") scale += 0.0039;
+	if(Unc=="Down") scale -= 0.0039;
+      }
+      if(DM==1) { // 1 prong + pi0
+	scale = -0.0057;
+	if(Unc=="Up") scale += 0.0037;
+	if(Unc=="Down") scale -= 0.0031;
+      }
+      if(DM==10 || DM==11) { // 3 prong
+	scale = -0.0074;
+	if(Unc=="Up") scale += 0.0032;
+	if(Unc=="Down") scale -= 0.0032;
+      }
+    }
+    //
+    if(genmatch == 1 || genmatch == 3) {
+      if(std::abs(p4.eta()) < 1.479) { // barrel electrons
+	scale = -0.0033;
+	if(Unc=="Up") scale += 0.0050;
+	if(Unc=="Down") scale -= 0.0050;
+      }
+      if(std::abs(p4.eta()) > 1.479) { // endcap electrons
+	scale = -0.0056;
+	if(Unc=="Up") scale += 0.0125;
+	if(Unc=="Down") scale -= 0.0125;
+      }
     }
   }
   //

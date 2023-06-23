@@ -23,6 +23,15 @@ HLTLIST = cms.VPSet(
         leg2 = cms.int32(999),
         ),
     cms.PSet (
+        HLT = cms.string("HLT_IsoMu24_eta2p1_v"),  # Davide: This one looks ok in HLT GUI
+        path1 = cms.vstring ("hltL3crIsoL1sSingleMu22erL1f0L2f10QL3f24QL3trkIsoFiltered0p07"),
+        path2 = cms.vstring (""),
+        path3 = cms.vstring (""),
+        path4 = cms.vstring (""),
+        leg1 = cms.int32(13),
+        leg2 = cms.int32(999)
+        ),
+    cms.PSet (
         HLT = cms.string("HLT_IsoMu24_v"), # ---------- it's prescaled: TO BE REMOVED
         path1 = cms.vstring ("hltL3crIsoL1sSingleMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p07"),
         path2 = cms.vstring (""),

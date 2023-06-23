@@ -47,6 +47,7 @@ class SysHelper{
   void GetPV(std::vector<float> _RefitPVBS_x, std::vector<float> _RefitPVBS_y, std::vector<float> _RefitPVBS_z, std::vector<std::vector<std::vector<double>>> _RefitPVBS_Cov, std::vector<size_t> _VertexHashBS1, std::vector<size_t> _VertexHashBS2, std::vector<size_t> _LeptonHash);
   bool FillPV(int tauIndex, int muIndex);
   void GetMETCov(float cov00, float cov10, float cov11);
+  void GetMETUnclustered(float METunc_pxUp, float METunc_pyUp, float METunc_pxDown, float METunc_pyDown);
   void GetJECUnc(std::map<std::string, std::vector<Float_t>> JECmapUp, std::map<std::string, std::vector<Float_t>> JECmapDown, myJECMap* JECmap, JetCorrectionUncertainty* JECunc);
   void GetPrefiringWeights(double pref, double prefUp, double prefDown);
   void GetTauSpinnerWeights(const double wEven, const double wOdd, const double wMM);
@@ -108,8 +109,15 @@ class SysHelper{
   double _genpvPhiCP;
   //Triggers
   bool _trgIsoMu;
-  bool _extraIsoMu;
   bool _trgXMuTau;
+  bool _isomu22;
+  bool _isomu22_2p1;
+  bool _isotkmu22;
+  bool _isotkmu22_2p1;
+  bool _isomu24;
+  bool _isomu24_2p1;
+  bool _isomu27;
+  bool _trgMatch;
   //Jets, Pair and MET
   bool _isOSpair;
   bool _isIso;
@@ -141,6 +149,10 @@ class SysHelper{
   float _PUPPIMETCov00;
   float _PUPPIMETCov10;
   float _PUPPIMETCov11;
+  float _METunc_pxUp;
+  float _METunc_pyUp;
+  float _METunc_pxDown;
+  float _METunc_pyDown;
   double _pvPhiCP;
   double _dpPhiCP;
   //Weights

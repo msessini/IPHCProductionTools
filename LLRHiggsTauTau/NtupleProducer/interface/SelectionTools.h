@@ -22,6 +22,7 @@ namespace seltools{
   bool CHECK_BIT(unsigned long long var, int pos);
   bool ComparePairsbyIso(const pat::CompositeCandidate i, const pat::CompositeCandidate j);
   float ComputeMT(math::XYZTLorentzVector VisP4, float METx, float METy);
+  bool OfflineTrgCut(std::string type, int muOnline, int tauOnline, const reco::Candidate* mu, const reco::Candidate* tau);
 
 };
 #endif
